@@ -1,0 +1,22 @@
+rules_version = '2';
+
+// Only the email addresses listed below can read or change the CRM data.
+// Add each team member's sign-in email (in lower case), then publish the rules again.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isTeam() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email.lower() in [
+          'rashidp.connect@gmail.com',
+          'admin@milifemedicity.com',
+          'gokul@milifemedicity.com'
+        ];
+    }
+
+    match /{document=**} {
+      allow read, write: if isTeam();
+    }
+  }
+}

@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MiLife Sales Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700;6..12,800&display=swap" rel="stylesheet">
+<style>
+/* Layout: white brand sidebar (logo + nav) beside a soft workspace; each view opens with a header, then summary, then detail. */
+:root{
+  --teal:#0D8D8F; --teal-deep:#08595B; --teal-ink:#0A6F71; --teal-soft:#E4F2F2; --teal-tint:#F1F8F8;
+  --gold:#F5BA19; --gold-soft:#FDF3D5; --gold-ink:#8A6200;
+  --bg:#F3F6F6; --surface:#FFFFFF; --surface-2:#F7FAFA; --side:#FFFFFF;
+  --ink:#122C2C; --ink-2:#2E4A49; --muted:#64797A; --line:#E1E9E9; --line-2:#EDF2F2;
+  --good:#1D8A4E; --good-soft:#E3F4EA; --warn:#A87100; --warn-soft:#FBF1D9; --bad:#B9382F; --bad-soft:#F9E5E3;
+  --c-ml:#F5BA19; --c-ar:#0D8D8F; --c-en:#5878C4; --c-hi:#D9734E; --c-x1:#8C6BC2; --c-x2:#4FA3C7; --c-x3:#9AA9A8;
+  --ch-wa:#1FAA59; --ch-form:#F5BA19; --ch-call:#5878C4; --ch-web:#8C6BC2; --ch-dm:#D9734E; --ch-person:#7C8E8D; --ch-other:#B8C4C3;
+  --shadow-sm:0 1px 2px rgba(8,60,60,.05);
+  --shadow:0 1px 2px rgba(8,60,60,.04),0 8px 24px -8px rgba(8,60,60,.10);
+  --shadow-lg:0 24px 60px -12px rgba(5,40,40,.30);
+  --font-display:"Nunito",ui-rounded,"Segoe UI",system-ui,sans-serif;
+  --font-body:"Nunito Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --teal:#25AFB1; --teal-deep:#0B4A4C; --teal-ink:#6ED3D4; --teal-soft:#123738; --teal-tint:#10292A;
+    --gold:#F5BA19; --gold-soft:#3A3013; --gold-ink:#F8D069;
+    --bg:#0B1818; --surface:#112323; --surface-2:#152B2B; --side:#0E1E1E;
+    --ink:#E6F1F0; --ink-2:#C3D6D5; --muted:#8FA8A7; --line:#203A3A; --line-2:#1A3232;
+    --good:#4FC685; --good-soft:#143524; --warn:#E8AE40; --warn-soft:#382C12; --bad:#F07C73; --bad-soft:#3B1B19;
+    --c-ar:#25AFB1; --c-en:#7D9BE0; --c-hi:#E99472; --ch-call:#7D9BE0;
+    --shadow-sm:none; --shadow:none; --shadow-lg:0 24px 60px -12px rgba(0,0,0,.6); color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --teal:#25AFB1; --teal-deep:#0B4A4C; --teal-ink:#6ED3D4; --teal-soft:#123738; --teal-tint:#10292A;
+  --gold:#F5BA19; --gold-soft:#3A3013; --gold-ink:#F8D069;
+  --bg:#0B1818; --surface:#112323; --surface-2:#152B2B; --side:#0E1E1E;
+  --ink:#E6F1F0; --ink-2:#C3D6D5; --muted:#8FA8A7; --line:#203A3A; --line-2:#1A3232;
+  --good:#4FC685; --good-soft:#143524; --warn:#E8AE40; --warn-soft:#382C12; --bad:#F07C73; --bad-soft:#3B1B19;
+  --c-ar:#25AFB1; --c-en:#7D9BE0; --c-hi:#E99472; --ch-call:#7D9BE0;
+  --shadow-sm:none; --shadow:none; --shadow-lg:0 24px 60px -12px rgba(0,0,0,.6); color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--font-display);margin:0;text-wrap:balance;letter-spacing:-.015em;color:var(--ink)}
+h1{font-size:28px;font-weight:900}
+h2{font-size:18px;font-weight:800}
+h3{font-size:15px;font-weight:800}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:8px}
+
+/* ---------- shell ---------- */
+.shell{display:grid;grid-template-columns:252px minmax(0,1fr);min-height:100%}
+.side{position:sticky;top:0;height:100vh;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:26px 18px 18px;gap:26px}
+.logo{display:block;padding:4px 8px 22px;border-bottom:1px solid var(--line-2);text-decoration:none}
+.logo img{width:100%;max-width:196px;height:auto;display:block}
+.logo .lg-dark{display:none}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .logo .lg-light{display:none}:root:not([data-theme="light"]) .logo .lg-dark{display:block}}
+:root[data-theme="dark"] .logo .lg-light{display:none}
+:root[data-theme="dark"] .logo .lg-dark{display:block}
+.logo span{display:block;margin-top:12px;font-family:var(--font-display);font-weight:800;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.logo span i{display:inline-block;width:18px;height:2px;background:var(--gold);vertical-align:middle;margin-right:8px;border-radius:2px}
+nav.menu{display:grid;gap:4px}
+.mi{display:flex;align-items:center;gap:12px;white-space:nowrap;padding:10px 12px;border-radius:12px;border:0;background:transparent;color:var(--ink-2);font-weight:700;cursor:pointer;text-align:left;transition:background .2s var(--ease),color .2s var(--ease)}
+.mi svg{width:19px;height:19px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.mi:hover{background:var(--teal-tint);color:var(--teal-ink)}
+.mi[aria-current="page"]{background:var(--teal);color:#fff;box-shadow:0 6px 16px -6px color-mix(in srgb,var(--teal) 70%,transparent)}
+.mi[aria-current="page"] svg{opacity:1}
+.mi .cnt{margin-left:auto;font-size:12px;background:var(--gold);color:#3b2a00;border-radius:999px;padding:1px 8px;font-weight:800}
+.side-foot{margin-top:auto;display:grid;gap:10px;padding:14px;border-radius:14px;background:var(--teal-tint);font-size:13px;color:var(--muted)}
+.side-foot b{color:var(--ink)}
+.sync{display:flex;align-items:center;gap:8px;font-weight:700}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px var(--good-soft)}
+.sync.off i{background:var(--bad);box-shadow:0 0 0 3px var(--bad-soft)}
+
+.main{min-width:0;padding:28px 36px 48px;display:grid;grid-template-columns:minmax(0,1fr);gap:22px;align-content:start;max-width:1320px;width:100%}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ph p{color:var(--muted);margin-top:4px;max-width:62ch}
+.ph-r{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.monthsw{display:flex;align-items:center;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow-sm)}
+.monthsw button{border:0;background:transparent;width:32px;height:32px;border-radius:50%;cursor:pointer;color:var(--teal-ink);display:grid;place-items:center}
+.monthsw button svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.monthsw button:hover{background:var(--teal-soft)}
+.monthsw span{font-family:var(--font-display);font-weight:800;min-width:128px;text-align:center}
+
+/* ---------- motion ---------- */
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.enter > *{animation:rise .5s var(--ease) both}
+.enter > *:nth-child(2){animation-delay:.04s}.enter > *:nth-child(3){animation-delay:.08s}.enter > *:nth-child(4){animation-delay:.12s}.enter > *:nth-child(5){animation-delay:.16s}.enter > *:nth-child(6){animation-delay:.2s}.enter > *:nth-child(n+7){animation-delay:.24s}
+.enter .stack{animation:grow .9s var(--ease) both;animation-delay:.15s}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;overflow:hidden;border-radius:22px;padding:26px 30px;color:#fff;background:radial-gradient(120% 140% at 0% 0%,#14A2A4 0%,var(--teal) 38%,#0A6466 100%);box-shadow:0 18px 40px -18px rgba(8,90,92,.55);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center}
+.hero::after{content:"";position:absolute;right:-60px;top:50%;width:330px;height:330px;transform:translateY(-50%) rotate(8deg);background:url(emblem-white.png) center/contain no-repeat;opacity:.11;pointer-events:none}
+.hero .eb{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
+.hero h1{color:#fff;font-size:30px;margin-top:6px}
+.hero p{color:rgba(255,255,255,.82);margin-top:6px}
+.hero-stats{display:flex;gap:10px;position:relative;z-index:1;flex-wrap:wrap}
+.hs{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);backdrop-filter:blur(6px);border-radius:16px;padding:12px 16px;min-width:116px}
+.hs b{display:block;font-family:var(--font-display);font-size:26px;font-weight:900;line-height:1.1}
+.hs > span{font-size:12px;font-weight:700;color:rgba(255,255,255,.78)}
+.hs.gold{background:var(--gold);border-color:var(--gold);color:#3b2a00}
+.hs.gold > span{color:#5c4300}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px 22px}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.card-h p{margin-top:3px;color:var(--muted);font-size:13.5px}
+.grid{display:grid;gap:18px}
+.g-tiles{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
+.g-2{grid-template-columns:repeat(auto-fit,minmax(360px,1fr))}
+.g-3{grid-template-columns:repeat(auto-fit,minmax(270px,1fr))}
+.g-4{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow);display:grid;gap:2px;transition:transform .25s var(--ease),box-shadow .25s var(--ease)}
+.tile:hover{transform:translateY(-2px)}
+.tile .lbl{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--muted)}
+.tile .lbl i{width:8px;height:8px;border-radius:50%;background:var(--teal)}
+.tile .val{font-family:var(--font-display);font-weight:900;font-size:30px;line-height:1.15;margin-top:4px}
+.tile .sub{font-size:13px;color:var(--muted)}
+
+/* bars */
+.bars{display:grid;gap:12px}
+.brow{display:grid;grid-template-columns:minmax(100px,150px) minmax(0,1fr) 78px;gap:12px;align-items:center;font-size:14px}
+.brow .bn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:var(--ink-2)}
+.track{height:10px;background:var(--line-2);border-radius:999px;overflow:hidden}
+.stack{display:flex;height:100%;transform-origin:left center}
+.stack > i{display:block;height:100%}
+.stack > i + i{box-shadow:inset 1.5px 0 0 var(--surface)}
+.brow .bv{text-align:right;font-variant-numeric:tabular-nums;font-weight:800}
+.brow .bv small{color:var(--muted);font-weight:600;margin-left:3px}
+.legend{display:flex;gap:6px 14px;font-size:13px;color:var(--muted);flex-wrap:wrap}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:3px}
+.groups{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.grp{flex:1;min-width:110px;background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;padding:8px 12px}
+.grp b{display:block;font-family:var(--font-display);font-size:20px}
+.grp span{font-size:12px;color:var(--muted);font-weight:700}
+
+/* highlight */
+.hl{display:flex;gap:14px;align-items:center;padding:16px;border-radius:18px;border:1px solid var(--line);background:var(--surface);box-shadow:var(--shadow);transition:transform .25s var(--ease)}
+.hl:hover{transform:translateY(-2px)}
+.hl .k{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.hl .who{font-family:var(--font-display);font-weight:800;font-size:17px;display:block;margin:1px 0}
+.hl .why{font-size:13px;color:var(--muted)}
+.hl.star{background:linear-gradient(140deg,var(--gold-soft),var(--surface) 75%);border-color:color-mix(in srgb,var(--gold) 45%,var(--line))}
+.hl > div{min-width:0}
+
+/* avatar */
+.av{width:36px;height:36px;border-radius:50%;display:inline-grid;place-items:center;font-family:var(--font-display);font-weight:900;font-size:13px;flex:none;color:var(--teal-deep);background:var(--teal-soft)}
+.av.lg{width:46px;height:46px;font-size:16px}
+.av.t1{background:#FDF0CC;color:#7A5600}.av.t2{background:#E1EEF9;color:#2E5590}.av.t3{background:#F7E4DC;color:#9A4325}.av.t4{background:#ECE5F7;color:#5B3E91}
+:root[data-theme="dark"] .av{filter:saturate(.8) brightness(.9)}
+.who-cell{display:flex;align-items:center;gap:10px;min-width:0}
+.namebtn{font-weight:800;cursor:pointer;color:var(--ink);background:none;border:0;padding:0;text-align:left;font-size:14.5px}
+.namebtn:hover{color:var(--teal-ink)}
+.who-cell small{display:block;color:var(--muted);font-size:12.5px}
+
+/* tables */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line-2)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line-2);white-space:nowrap}
+th{font-size:12px;letter-spacing:.04em;color:var(--muted);background:var(--surface-2);font-weight:800;text-transform:uppercase}
+th.sortable{cursor:pointer;user-select:none}
+th.sortable:hover{color:var(--teal-ink)}
+td.r,th.r{text-align:right}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--teal-tint)}
+tbody tr:last-child td{border-bottom:0}
+.rank{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;font-weight:900;font-size:13px;color:var(--muted);font-family:var(--font-display)}
+.rank.r1{background:var(--gold);color:#3b2a00}
+.rank.r2,.rank.r3{background:var(--teal-soft);color:var(--teal-ink)}
+.scorebar{display:flex;align-items:center;gap:10px;justify-content:flex-end}
+.scorebar .track{width:74px;height:7px}
+.scorebar b{font-family:var(--font-display);font-size:16px;min-width:26px;text-align:right}
+
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap;line-height:1.4}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.chip.mute{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.chip.star{background:var(--gold);color:#3b2a00}
+.chip.teal{background:var(--teal-soft);color:var(--teal-ink)}
+.langs{display:inline-flex;gap:4px;flex-wrap:wrap}
+.lg{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800;padding:2px 9px 2px 7px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2)}
+.lg i{width:7px;height:7px;border-radius:50%}
+.st{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:12.5px;padding:3px 10px;border-radius:999px}
+.st i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.st-New{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.st-Contacted{background:#E6EEFA;color:#3A5DA8}
+.st-Follow-up{background:var(--warn-soft);color:var(--warn)}
+.st-Confirmed{background:var(--good-soft);color:var(--good)}
+.st-Lost{background:var(--bad-soft);color:var(--bad)}
+:root[data-theme="dark"] .st-Contacted{background:#1B2A45;color:#9DB6EC}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .st-Contacted{background:#1B2A45;color:#9DB6EC}}
+select.stsel{appearance:none;-webkit-appearance:none;border:0;border-radius:999px;padding:4px 26px 4px 12px;font-weight:800;font-size:12.5px;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);background-position:calc(100% - 13px) 52%,calc(100% - 9px) 52%;background-size:4px 4px;background-repeat:no-repeat}
+
+/* controls */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.toolbar .grow{flex:1;min-width:200px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:12px;font-weight:800;cursor:pointer;white-space:nowrap;transition:transform .15s var(--ease),background .2s,border-color .2s,box-shadow .2s;box-shadow:var(--shadow-sm)}
+.btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.btn:hover{border-color:var(--teal);color:var(--teal-ink)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--teal);border-color:var(--teal);color:#fff;box-shadow:0 8px 18px -8px color-mix(in srgb,var(--teal) 80%,transparent)}
+.btn.primary:hover{background:var(--teal-ink);border-color:var(--teal-ink);color:#fff}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:#3b2a00}
+.btn.gold:hover{color:#3b2a00;filter:brightness(1.04)}
+.btn.ghost-w{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.3);color:#fff;box-shadow:none}
+.btn.ghost-w:hover{background:rgba(255,255,255,.24);color:#fff;border-color:rgba(255,255,255,.5)}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 35%,var(--line))}
+.btn.danger.solid{background:var(--bad);color:#fff;border-color:var(--bad)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.iconbtn{border:0;background:none;cursor:pointer;color:var(--muted);width:30px;height:30px;border-radius:8px;display:inline-grid;place-items:center}
+.iconbtn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.iconbtn:hover{background:var(--surface-2);color:var(--ink)}
+input[type=text],input[type=search],input[type=number],input[type=date],input[type=tel],select,textarea{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:9px 12px;min-width:0;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 4px color-mix(in srgb,var(--teal) 16%,transparent)}
+textarea{width:100%;min-height:150px;resize:vertical;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+label.f{display:grid;gap:6px;align-content:start;font-size:13px;font-weight:800;color:var(--ink-2)}
+label.f > input,label.f > select,label.f > textarea{font-weight:400;font-size:15px;color:var(--ink)}
+label.f .hint{font-weight:500;color:var(--muted);font-size:12.5px}
+.form{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.form .full{grid-column:1/-1}
+.seg{display:inline-flex;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:6px 12px;cursor:pointer;font-weight:800;font-size:13px;color:var(--muted);border-radius:9px;transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--teal-ink);box-shadow:var(--shadow-sm),0 0 0 1px var(--line)}
+.pick{display:flex;gap:8px;flex-wrap:wrap}
+.pick button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-weight:800;font-size:13.5px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;transition:all .2s var(--ease)}
+.pick button i{width:8px;height:8px;border-radius:50%}
+.pick button[aria-pressed="true"]{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink)}
+.pick button[aria-pressed="true"]::after{content:"✓";font-weight:900}
+
+/* banner */
+.banner{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-radius:14px;font-weight:600;font-size:14px}
+.banner.sample{background:var(--gold-soft);color:var(--gold-ink);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent)}
+.banner.offline{background:var(--bad-soft);color:var(--bad)}
+.banner.seed{background:var(--teal-soft);color:var(--teal-ink)}
+.banner .sp{flex:1;min-width:220px}
+
+/* audits */
+.cycle{display:grid;gap:14px;align-content:start;position:relative}
+.cycle .meta{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cycle .when{font-size:13px;color:var(--muted);font-weight:700}
+.cycle.now{border-color:color-mix(in srgb,var(--teal) 55%,var(--line));box-shadow:0 0 0 3px var(--teal-soft),var(--shadow)}
+.cycle.now::before{content:"Current";position:absolute;top:-10px;left:20px;background:var(--teal);color:#fff;font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;padding:2px 10px;border-radius:999px}
+.plist{display:grid;gap:6px}
+.prow{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:8px 10px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface-2);font-size:14px;transition:border-color .2s}
+.prow:hover{border-color:var(--line)}
+.prow .pn{display:flex;align-items:center;gap:10px;min-width:0;font-weight:800}
+.prow .pn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prow .pa{display:flex;gap:6px;align-items:center;flex-shrink:0}
+.ring{--p:0;width:54px;height:54px;border-radius:50%;background:conic-gradient(var(--good) calc(var(--p)*1%),var(--line-2) 0);display:grid;place-items:center;flex:none}
+.ring b{width:42px;height:42px;border-radius:50%;background:var(--surface);display:grid;place-items:center;font-family:var(--font-display);font-size:13px}
+.crit{display:grid;gap:8px}
+.critrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:11px 14px;border:1px solid var(--line-2);border-radius:14px;background:var(--surface-2)}
+.critrow b{display:block;font-size:14.5px}
+.critrow span{font-size:13px;color:var(--muted)}
+.rate{display:inline-flex;gap:4px}
+.rate button{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:900;cursor:pointer;font-family:var(--font-display);transition:all .15s var(--ease)}
+.rate button:hover{border-color:var(--teal)}
+.rate button[aria-pressed="true"]{background:var(--teal);color:#fff;border-color:var(--teal);transform:scale(1.06)}
+.bigscore{font-family:var(--font-display);font-weight:900;font-size:40px;line-height:1;color:var(--teal-ink)}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(4,26,26,.42);backdrop-filter:blur(3px);display:none;align-items:flex-start;justify-content:center;padding:44px 16px;z-index:50;overflow-y:auto}
+.overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:22px;border:1px solid var(--line);width:min(780px,100%);padding:24px 26px;display:grid;gap:18px;box-shadow:var(--shadow-lg);animation:pop .3s var(--ease) both}
+.modal-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.modal-h p{margin-top:4px;color:var(--muted);font-size:14px}
+.modal-f{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;align-items:center}
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:12px;font-weight:800;z-index:60;opacity:0;pointer-events:none;transition:opacity .25s var(--ease),transform .25s var(--ease);box-shadow:var(--shadow-lg)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.empty{padding:36px 20px;text-align:center;color:var(--muted);display:grid;gap:8px;justify-items:center}
+.empty img{width:56px;opacity:.5;margin-bottom:4px}
+.note{font-size:13px;color:var(--muted)}
+.muted{color:var(--muted)}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:10px}
+.kv div{background:var(--surface-2);border:1px solid var(--line-2);border-radius:14px;padding:10px 12px}
+.kv b{display:block;font-family:var(--font-display);font-size:22px;font-weight:900}
+.kv span{font-size:12px;color:var(--muted);font-weight:800}
+.loading{padding:80px 20px;text-align:center;color:var(--muted);font-weight:700;display:grid;justify-items:center;gap:14px}
+.loading img{width:64px;animation:spin 2.4s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.plat-row{display:grid;grid-template-columns:1fr 170px 34px;gap:8px;align-items:center}
+
+.period{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.period > select{border-radius:999px;padding:8px 14px;font-weight:800;background:var(--surface);box-shadow:var(--shadow-sm)}
+.period .plabel{font-size:13px;font-weight:700;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:8px 14px}
+.period .range{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 10px}
+.period .range input{border:0;padding:5px 4px;background:transparent}
+.period .range span{font-size:13px;color:var(--muted);font-weight:700}
+.campname{font-weight:800;white-space:normal;min-width:200px;display:block}
+.fbar{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.fbar label.f{font-size:12px}
+.fbar select{font-size:14px;padding:7px 10px}
+.fchips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fchip{display:inline-flex;align-items:center;gap:6px;background:var(--teal-soft);color:var(--teal-ink);border:0;border-radius:999px;padding:4px 6px 4px 12px;font-weight:800;font-size:12.5px;cursor:pointer}
+.fchip span{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.08);font-size:11px}
+.drill{cursor:pointer}
+.drill:hover td:first-child{color:var(--teal-ink)}
+.ratebar{display:flex;align-items:center;gap:10px;min-width:170px}
+.ratebar .track{flex:1;height:8px}
+.ratebar b{min-width:48px;text-align:right;font-family:var(--font-display)}
+.delta{font-size:12px;font-weight:800;padding:2px 8px;border-radius:999px}
+.delta.up{background:var(--good-soft);color:var(--good)}.delta.down{background:var(--bad-soft);color:var(--bad)}.delta.flat{background:var(--surface-2);color:var(--muted)}
+.hm{border-collapse:separate;border-spacing:4px;width:auto;min-width:100%}
+.hm th,.hm td{border:0;padding:0;background:none;text-transform:none;letter-spacing:0}
+.hm thead th{font-size:12px;color:var(--muted);font-weight:800;padding:4px 6px;text-align:center;white-space:normal;max-width:90px}
+.hm tbody th{font-size:13px;font-weight:800;color:var(--ink-2);text-align:left;padding-right:8px;white-space:nowrap}
+.hm .cell{border-radius:10px;padding:8px 6px;text-align:center;min-width:72px;cursor:pointer;transition:transform .15s var(--ease)}
+.hm .cell:hover{transform:scale(1.04)}
+.hm .cell b{display:block;font-family:var(--font-display);font-size:15px}
+.hm .cell small{font-size:11px;opacity:.8}
+.hm .cell.none{background:var(--surface-2);color:var(--muted);cursor:default}
+.hm .cell.few{opacity:.55}
+@media (max-width:900px){
+  .shell{grid-template-columns:1fr}
+  .side{position:sticky;top:0;z-index:30;height:auto;flex-direction:row;align-items:center;padding:10px 14px;gap:12px;border-right:0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .logo{padding:0;border:0}
+  .logo img{max-width:130px}
+  .logo span,.side-foot{display:none}
+  nav.menu{display:flex;overflow-x:auto;width:100%;gap:4px}
+  .mi{padding:8px 12px;white-space:nowrap}
+  .main{padding:18px 16px 40px}
+  .hero{grid-template-columns:1fr;padding:22px}
+  .g-2{grid-template-columns:1fr}
+}
+@media (max-width:520px){ .brow{grid-template-columns:92px minmax(0,1fr) 64px} h1{font-size:24px} .hero h1{font-size:24px} }
+/* sign-in screen (standalone hosting) */
+.login{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;background:var(--bg)}
+.login form{width:100%;max-width:400px;display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-lg);padding:30px 28px}
+.login img{height:52px;width:auto;justify-self:center}
+.login h1{margin:4px 0 0;text-align:center;font-family:var(--font-display);font-size:24px;color:var(--ink)}
+.login p{margin:0;text-align:center;color:var(--muted);font-size:14px}
+.login label{display:grid;gap:6px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.login input{font:inherit;font-size:15px;padding:11px 13px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.login input:focus{outline:2px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+.login .err{color:var(--bad);font-size:13px;font-weight:700;text-align:center;min-height:18px}
+.login .btn{justify-content:center}
+.login .link{background:none;border:0;color:var(--teal-ink);font:inherit;font-size:13px;font-weight:700;cursor:pointer;justify-self:center}
+.who{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;word-break:break-all}
+.who button{background:none;border:0;color:var(--teal-ink);font:inherit;font-weight:800;cursor:pointer;padding:0;white-space:nowrap}
+</style>
+<script src="config.js"></script>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <a class="logo" href="#dashboard" aria-label="MiLife Medicity home">
+      <img class="lg-light" src="logo.png" alt="MiLife Medicity">
+      <img class="lg-dark" src="logo-dark.png" alt="MiLife Medicity">
+      <span><i></i>Sales Performance</span>
+    </a>
+    <nav class="menu" aria-label="Sections">
+      <button class="mi" data-go="dashboard"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>Dashboard</button>
+      <button class="mi" data-go="closing"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg>Closing analysis</button>
+      <button class="mi" data-go="marketing"><svg viewBox="0 0 24 24"><path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12"/></svg>Marketing</button>
+      <button class="mi" data-go="leads"><svg viewBox="0 0 24 24"><path d="M4 13h4l2 3h4l2-3h4"/><path d="M5.5 5h13L21 13v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/></svg>Leads</button>
+      <button class="mi" data-go="audits"><svg viewBox="0 0 24 24"><path d="M21 12a8.5 8.5 0 0 1-12.6 7.4L3 21l1.6-5.2A8.5 8.5 0 1 1 21 12z"/><path d="m8.5 12 2.4 2.4 4.6-4.8"/></svg>WhatsApp audits<span class="cnt" id="auditCnt" hidden></span></button>
+      <button class="mi" data-go="team"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 20a6.5 6.5 0 0 0-2.5-5.1"/></svg>Sales team</button>
+      <button class="mi" data-go="setup"><svg viewBox="0 0 24 24"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>Settings</button>
+    </nav>
+    <div class="side-foot">
+      <div class="sync" id="sync"><i></i><span>Connecting…</span></div>
+      <div>WhatsApp reviews by <b id="revName">Gokul Sir</b></div>
+      <div class="who" id="who" hidden><span id="whoEmail"></span><button type="button" id="signOut">Sign out</button></div>
+    </div>
+  </aside>
+  <main class="main" id="app"><div class="loading"><img src="emblem.png" alt="">Loading your sales data…</div></main>
+</div>
+<div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+"use strict";
+/* ================= constants ================= */
+const STATUSES=['New','Contacted','Follow-up','Confirmed','Lost'];
+const TREATMENTS=['Pediatric rehab','Spine care','Pain management','Physiotherapy','Neuro rehab','Other'];
+const ROLES=['Doctor','GRE','FOM','Sales','Other'];
+const GROUPS=['Paid ads','Website','Referral','Management','Walk-in','Other'];
+const CRITERIA=[
+  {k:'speed',t:'First reply speed',d:'New enquiries answered quickly, within working hours'},
+  {k:'missed',t:'No unanswered chats',d:'No leads left on "seen" or without a reply'},
+  {k:'follow',t:'Follow-up discipline',d:'Regular follow-ups until the lead decides'},
+  {k:'tone',t:'Tone and language',d:'Polite, warm, correct in the patient\'s language'},
+  {k:'knowledge',t:'Treatment and package knowledge',d:'Accurate details on therapy, stay, meals, cost'},
+  {k:'closing',t:'Confirmation effort',d:'Asks for reports, books consults, gets the confirmation'}
+];
+const DEFAULT_SETTINGS={
+  weights:{audit:40,confirmations:25,closing:25,volume:10},
+  minLeads:5, target:0,
+  languages:['Malayalam','Arabic','English','Hindi'],
+  platforms:[
+    {n:'Meta Ads',g:'Paid ads'},{n:'Snapchat Ads',g:'Paid ads'},{n:'Google Ads',g:'Paid ads'},{n:'TikTok Ads',g:'Paid ads'},
+    {n:'LinkedIn Ads',g:'Paid ads'},{n:'X Ads',g:'Paid ads'},{n:'Website',g:'Website'},{n:'Referral',g:'Referral'},
+    {n:'Iqbal Sir (MD)',g:'Management'},{n:'Dr Shabeer',g:'Management'},{n:'Walk-in',g:'Walk-in'},{n:'Other',g:'Other'}
+  ],
+  channels:['WhatsApp','Lead form','Phone call','Website form','DM','In person'],
+  reviewers:['Gokul Sir'],
+  currency:'₹',
+  regions:['GCC (all)','Saudi Arabia','UAE','Qatar','Kuwait','Oman','India','Kerala','Other'],
+  creatives:['Video','Doctor video','Testimonial video','Image','Carousel','Search ad','Other'],
+  confirmWords:'confirmed, confirm, booked, admitted, admission, converted, coming'
+};
+const OFFLINE_ROSTER=`JABIR IBNU MEDICITY(AR)
+JIMSHAD MEDICARE(AR)
+PRASHAND MEDICITY (AR)
+RAHEESA GRE MEDICITY
+YASER GRE MEDICITY
+SHABNA ZAHRA
+ANEES PUTHUR(AR)
+DR ANAGHA MEDICARE
+DR FARSANA MEDICITY(AR)
+DR FATHIMA MEDICITY (AR)
+DR MAHI GOPAN MEDICITY
+DR NASEEBA KOTTAKAL (AR)
+DR SUNEEB MEDICITY(AR)
+SHAMEEM GRE MEDICITY(AR)
+VIBIN FOM KOTTAKAL`;
+const IC={
+  plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+  up:'<svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>',
+  down:'<svg viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>',
+  shuffle:'<svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  left:'<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+  right:'<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+  trash:'<svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg>'
+};
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const uid=()=>{const a=new Uint32Array(2);crypto.getRandomValues(a);return a[0].toString(36)+a[1].toString(36).slice(0,4)};
+const normTxt=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS_L=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function todayStr(){const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`}
+function monthOf(dateStr){return String(dateStr).slice(0,7)}
+function monthLabel(m){const [y,mo]=m.split('-').map(Number);return `${MONTHS_L[mo-1]} ${y}`}
+function shiftMonth(m,delta){let [y,mo]=m.split('-').map(Number);mo+=delta;while(mo>12){mo-=12;y++}while(mo<1){mo+=12;y--}return `${y}-${pad(mo)}`}
+function daysIn(m){const [y,mo]=m.split('-').map(Number);return new Date(y,mo,0).getDate()}
+function cycleOfDay(day){return day<=10?1:day<=20?2:3}
+function cycleRange(m,c){const mo=MONTHS[+m.slice(5)-1];return c===1?`1–10 ${mo}`:c===2?`11–20 ${mo}`:`21–${daysIn(m)} ${mo}`}
+function currentCycle(m){const t=todayStr();if(monthOf(t)===m)return cycleOfDay(+t.slice(8));return m<monthOf(t)?4:0}
+function pct(a,b){return b?a/b*100:0}
+function fmtPct(v,d=0){return (Math.round(v*Math.pow(10,d))/Math.pow(10,d)).toFixed(d)+'%'}
+function ymd(y,m,d){if(!(y>1990&&m>=1&&m<=12&&d>=1&&d<=31))return null;return `${y}-${pad(m)}-${pad(d)}`}
+function titleCase(s){return s.toLowerCase().replace(/(^|[\s(])([a-z])/g,(a,b,c)=>b+c.toUpperCase())}
+function fmtDate(d){if(!d)return '';const [y,m,dd]=String(d).split('-');return `${+dd} ${MONTHS[+m-1]}`}
+function hashN(s,n){let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))>>>0;return h%n}
+function initials(name){const w=String(name).replace(/^Dr\.?\s+/i,'').replace(/\(.*?\)/g,'').trim().split(/\s+/);return ((w[0]||'')[0]||'')+((w[1]||'')[0]||'')}
+function avatar(p,lg){return `<span class="av ${lg?'lg':''} t${hashN(p.id||p.name,5)}" aria-hidden="true">${esc(initials(p.name).toUpperCase())}</span>`}
+function langsOf(p){return Array.isArray(p.langs)&&p.langs.length?p.langs:[p.team||'Malayalam']}
+const LANG_VARS={Malayalam:'var(--c-ml)',Arabic:'var(--c-ar)',English:'var(--c-en)',Hindi:'var(--c-hi)'};
+function langColor(l){if(LANG_VARS[l])return LANG_VARS[l];const i=Math.max(0,S.settings.languages.indexOf(l));return ['var(--c-x1)','var(--c-x2)','var(--c-x3)'][i%3]}
+const CH_VARS={'WhatsApp':'var(--ch-wa)','Lead form':'var(--ch-form)','Phone call':'var(--ch-call)','Website form':'var(--ch-web)','DM':'var(--ch-dm)','In person':'var(--ch-person)'};
+function chColor(c){return CH_VARS[c]||'var(--ch-other)'}
+function langChips(p){return `<span class="langs">${langsOf(p).map(l=>`<span class="lg"><i style="background:${langColor(l)}"></i>${esc(l)}</span>`).join('')}</span>`}
+function groupOf(platform){const p=S.settings.platforms.find(x=>x.n===platform);return p?p.g:'Other'}
+
+/* Parse a dropdown label like "DR NASEEBA KOTTAKAL (AR)" into a person. */
+function parseLabel(raw){
+  const code=String(raw||'').trim().replace(/\s+/g,' ');
+  if(!code)return null;
+  let s=code, langs=['Malayalam'], role='Sales', notes=[];
+  if(/\(\s*AR\b[^)]*\)?/i.test(s)){langs=['Arabic'];s=s.replace(/\(\s*AR\b[^)]*\)?/ig,' ')}
+  if(/^dr\.?\s+/i.test(s)){role='Doctor';s=s.replace(/^dr\.?\s+/i,'')}
+  const branchMap=[[/^medici(ty|t)?$/i,'Medicity'],[/^medicar(e)?$/i,'Medicare'],[/^puth(u|oo)r$/i,'Puthur'],[/^kottaka(l|la)?$/i,'Kottakal'],[/^zahra$/i,'Zahra']];
+  const branches=[]; const nameT=[];
+  for(const tok of s.split(/\s+/)){
+    if(!tok)continue;
+    if(/^(gre|fom|ehk)$/i.test(tok)){ if(role==='Sales')role=tok.toUpperCase()==='EHK'?'Other':tok.toUpperCase(); continue }
+    if(/^milife$/i.test(tok))continue;
+    if(/^naturop/i.test(tok)){notes.push('Naturopathy');continue}
+    const b=branchMap.find(([re])=>re.test(tok));
+    if(b){ if(!branches.includes(b[1]))branches.push(b[1]); continue }
+    if(branches.length && /^[a-z]$/i.test(tok))continue;
+    nameT.push(tok);
+  }
+  let name=titleCase(nameT.join(' ')||code).replace(/(\S)\(/g,'$1 (');
+  if(role==='Doctor')name='Dr '+name;
+  return {name,code,role,branch:branches.join(' ')||'—',langs,phone:'',notes:notes.join(', '),active:true};
+}
+function parseDate(raw,dayFirst=true){
+  if(raw==null)return null; const s=String(raw).trim(); if(!s)return null; let m;
+  if((m=s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})/)))return ymd(+m[1],+m[2],+m[3]);
+  if((m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/))){
+    let a=+m[1],b=+m[2],y=+m[3]; if(y<100)y+=2000;
+    let d=dayFirst?a:b, mo=dayFirst?b:a;
+    if(mo>12&&d<=12){const t=d;d=mo;mo=t}
+    return ymd(y,mo,d);
+  }
+  if(/^\d{5}(\.\d+)?$/.test(s)){const dt=new Date(Date.UTC(1899,11,30)+parseFloat(s)*86400000);return ymd(dt.getUTCFullYear(),dt.getUTCMonth()+1,dt.getUTCDate())}
+  const t=Date.parse(s); if(!isNaN(t)){const dt=new Date(t);return ymd(dt.getFullYear(),dt.getMonth()+1,dt.getDate())}
+  return null;
+}
+function normPlatform(raw,platforms){
+  const s=String(raw||'').toLowerCase().trim(); const names=platforms.map(p=>p.n);
+  const other=names.includes('Other')?'Other':names[names.length-1];
+  if(!s)return other;
+  const exact=names.find(x=>x.toLowerCase()===s); if(exact)return exact;
+  const rules=[[/iqbal/,'iqbal'],[/shab(ee|i)r/,'shabeer'],[/snap/,'snap'],[/tik ?tok/,'tiktok'],[/linked ?in/,'linkedin'],[/twitter|^x\b|\bx ads/,'x ads'],[/google|g ?ads|adwords|youtube|search/,'google'],[/meta|facebook|^fb\b|insta|^ig\b|whats|ctwa/,'meta'],[/web|site|landing|seo|organic/,'website'],[/refer/,'referral'],[/walk/,'walk']];
+  for(const [re,key] of rules){ if(re.test(s)){ const hit=names.find(x=>x.toLowerCase().includes(key)); if(hit)return hit } }
+  return other;
+}
+function normChannel(raw,channels,fallback){
+  const s=String(raw||'').toLowerCase().trim();
+  const find=k=>channels.find(x=>x.toLowerCase().includes(k));
+  if(s){
+    const exact=channels.find(x=>x.toLowerCase()===s); if(exact)return exact;
+    if(/whats|^wa\b|ctwa|click.?to/.test(s))return find('whatsapp')||channels[0];
+    if(/web.*form|site.*form/.test(s))return find('website')||channels[0];
+    if(/form|lead ?gen|instant/.test(s))return find('lead form')||channels[0];
+    if(/call|phone|tele/.test(s))return find('phone')||channels[0];
+    if(/\bdm\b|message|inbox|messenger/.test(s))return find('dm')||channels[0];
+    if(/walk|person|visit/.test(s))return find('person')||channels[0];
+  }
+  return fallback||channels[0];
+}
+function normLang(raw,languages){const s=String(raw||'').toLowerCase().trim(); if(!s)return null;
+  if(/^ar$|arab|عرب/.test(s))return 'Arabic'; if(/^ml$|^mal|malay|മല/.test(s))return 'Malayalam'; if(/^en$|eng/.test(s))return 'English'; if(/^hi$|hindi/.test(s))return 'Hindi';
+  return languages.find(l=>l.toLowerCase()===s)||null}
+function normStatus(raw,words){
+  const s=String(raw||'').toLowerCase().trim(); if(!s)return 'New';
+  const exact=STATUSES.find(x=>x.toLowerCase()===s); if(exact)return exact;
+  if(s==='converted')return 'Confirmed';
+  const negated=/\b(not|no|non|un|never)\b/.test(s);
+  if(words.some(w=>w&&s.includes(w)))return negated?'Lost':'Confirmed';
+  if(/lost|interest|junk|invalid|wrong|spam|cancel|no response|dead|reject|declin/.test(s))return negated||/lost|junk|invalid|wrong|spam|cancel|dead|reject|declin|no response/.test(s)?'Lost':'Contacted';
+  if(/follow|pending|thinking|later|call ?back|waiting|discussion/.test(s))return 'Follow-up';
+  if(/contact|called|replied|talk|spoke|responded/.test(s))return 'Contacted';
+  return 'New';
+}
+function matchStaff(raw,staff){
+  const s=normTxt(raw); if(!s)return null;
+  return staff.find(p=>normTxt(p.code)===s)||staff.find(p=>normTxt(p.name)===s)||staff.find(p=>normTxt(p.name.replace(/^Dr /,''))===s)
+    ||staff.find(p=>p.code&&(normTxt(p.code).startsWith(s)||s.startsWith(normTxt(p.code))))||null;
+}
+function parseCSV(text){
+  const first=(text.split(/\r?\n/)[0]||'');
+  const delim=(first.split('\t').length>first.split(',').length)?'\t':',';
+  const rows=[];let row=[],f='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++} else q=false } else f+=c; continue }
+    if(c==='"'&&f===''){q=true;continue}
+    if(c===delim){row.push(f);f='';continue}
+    if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n')i++; row.push(f);f=''; if(row.some(x=>x.trim()!==''))rows.push(row); row=[]; continue }
+    f+=c;
+  }
+  row.push(f); if(row.some(x=>x.trim()!==''))rows.push(row);
+  return rows;
+}
+
+/* ================= scoring (pure) ================= */
+function computeBoard(staff,leads,audits,settings){
+  const W=Object.assign({},settings.weights); if(W.confirmations==null&&W.conversions!=null)W.confirmations=W.conversions;
+  const minLeads=Math.max(1,+settings.minLeads||1), target=+settings.target||0;
+  const by={};
+  for(const p of staff)by[p.id]={p,n:0,c:0,lang:{},src:{},ch:{},st:{},auditList:[]};
+  for(const l of leads){const b=by[l.s]; if(!b)continue; b.n++; if(l.st==='Confirmed')b.c++; b.lang[l.lang]=(b.lang[l.lang]||0)+1; b.src[l.src]=(b.src[l.src]||0)+1; b.ch[l.ch]=(b.ch[l.ch]||0)+1; b.st[l.st]=(b.st[l.st]||0)+1}
+  for(const a of audits){if(by[a.staffId])by[a.staffId].auditList.push(a)}
+  const rows=Object.values(by).filter(b=>b.p.active!==false||b.n>0||b.auditList.length);
+  const anyLeads=rows.some(b=>b.n>0);
+  for(const b of rows){
+    b.rate=b.n?b.c/b.n:0;
+    b.adjRate=b.rate*Math.min(1,b.n/minLeads);
+    b.audit=b.auditList.length?b.auditList.reduce((s,a)=>s+(+a.pct||0),0)/b.auditList.length:null;
+  }
+  const maxC=Math.max(0,...rows.map(b=>b.c)), maxN=Math.max(0,...rows.map(b=>b.n)), maxAdj=Math.max(0,...rows.map(b=>b.adjRate));
+  for(const b of rows){
+    const parts=[];
+    if(b.audit!=null)parts.push(['audit',b.audit]);
+    if(anyLeads){
+      parts.push(['confirmations',target>0?Math.min(1,b.c/target)*100:(maxC?b.c/maxC*100:0)]);
+      parts.push(['closing',maxAdj?b.adjRate/maxAdj*100:0]);
+      parts.push(['volume',maxN?b.n/maxN*100:0]);
+    }
+    let ws=0,sum=0; for(const [k,v] of parts){const w=+W[k]||0; ws+=w; sum+=w*v}
+    b.parts=Object.fromEntries(parts);
+    b.score=ws?sum/ws:null;
+    b.provisional=b.audit==null;
+    b.grade=gradeOf(b.score);
+  }
+  rows.sort((a,b)=>(b.score??-1)-(a.score??-1)||b.c-a.c||b.n-a.n);
+  rows.forEach((b,i)=>b.rank=b.score==null?null:i+1);
+  return rows;
+}
+function gradeOf(s){if(s==null)return {t:'No data',c:'mute'}; if(s>=85)return {t:'Star',c:'star'}; if(s>=70)return {t:'Strong',c:'good'}; if(s>=55)return {t:'Average',c:'warn'}; return {t:'Needs coaching',c:'bad'}}
+function pickCount(remaining,cycle){const left=Math.max(1,4-cycle);return Math.min(remaining,Math.ceil(remaining/left))}
+function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const r=new Uint32Array(1);crypto.getRandomValues(r);const j=r[0]%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+
+/* Sample data generator: used for the offline preview, and once by Claude to seed the saved sample. */
+function makeSample(staff,month,opts){
+  let seed=hashN(month+(opts.salt||''),2147483647)+7;
+  const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+  const wpick=list=>{const t=list.reduce((s,x)=>s+x[1],0);let r=rnd()*t;for(const [k,w] of list){if((r-=w)<0)return k}return list[0][0]};
+  const plats=[['Meta Ads',38],['Snapchat Ads',16],['Google Ads',14],['TikTok Ads',7],['LinkedIn Ads',2],['X Ads',2],['Website',7],['Referral',6],['Iqbal Sir (MD)',4],['Dr Shabeer',3],['Walk-in',1]];
+  const chFor=p=>/Ads$/.test(p)?wpick([['WhatsApp',62],['Lead form',30],['Phone call',6],['DM',2]]):p==='Website'?wpick([['Website form',60],['WhatsApp',30],['Phone call',10]]):p==='Walk-in'?'In person':wpick([['Phone call',50],['WhatsApp',50]]);
+  const langs=[['Arabic',55],['Malayalam',34],['English',8],['Hindi',3]];
+  const tr=[['Pediatric rehab',40],['Spine care',15],['Pain management',15],['Physiotherapy',12],['Neuro rehab',13],['Other',5]];
+  const NM={Arabic:[['Abdullah','Faisal','Noura','Mohammed','Sara','Khalid','Reem','Turki','Hessa','Omar','Lama','Saud','Fahad','Maha','Yousef','Abeer','Nasser','Hind'],['Al-Qahtani','Al-Otaibi','Al-Harbi','Al-Shehri','Al-Dosari','Al-Mutairi','Al-Ghamdi','Al-Zahrani']],
+    Malayalam:[['Anjali','Rahul','Fathima','Muhammed','Sreeja','Arjun','Shahana','Nimisha','Ajmal','Lakshmi','Haris','Divya','Sinan','Ameena'],['K','P','M','T','V','C']],
+    English:[['John','Priya','Rizwan','Maria','Daniel','Aisha'],['Thomas','Fernandes','Khan','Joseph']],Hindi:[['Rohit','Pooja','Amit','Neha'],['Sharma','Verma','Gupta']]};
+  const active=staff.filter(p=>p.active!==false);
+  const skill={}; for(const p of active)skill[p.id]=.08+(hashN(p.id,100)/100)*.32;
+  const leads=[];
+  for(let i=0;i<opts.leads;i++){
+    const lang=wpick(langs);
+    const pool=active.filter(p=>langsOf(p).includes(lang)); const p=(pool.length?pool:active)[Math.floor(rnd()*(pool.length||active.length))];
+    const d=1+Math.floor(rnd()*opts.days); const age=opts.days-d;
+    const src=wpick(plats); const boost=/Iqbal|Shabeer|Referral/.test(src)?1.8:1;
+    const r=rnd(); const pc=Math.min(.75,skill[p.id]*boost*(age<3?.4:1));
+    const st=r<pc?'Confirmed':r<pc+.22?'Follow-up':r<pc+.44?'Contacted':age<4&&r<pc+.7?'New':r<pc+.62?'Lost':'Contacted';
+    const nm=NM[lang]||NM.English;
+    leads.push({r:'x'+uid(),d:`${month}-${pad(d)}`,s:p.id,src,ch:chFor(src),lang,st,nm:nm[0][Math.floor(rnd()*nm[0].length)]+' '+nm[1][Math.floor(rnd()*nm[1].length)],ph:'',tr:wpick(tr)});
+  }
+  const cycles={c1:[],c2:[],c3:[]}, audits=[];
+  let pool=active.slice().sort(()=>rnd()-.5);
+  for(let c=1;c<=opts.cycles;c++){
+    const n=pickCount(pool.length,c); const ids=pool.slice(0,n).map(p=>p.id); pool=pool.slice(n); cycles['c'+c]=ids;
+    ids.forEach((id,ix)=>{
+      if(c===opts.cycles&&ix>=ids.length-(opts.pending||0))return;
+      const base=1.6+skill[id]*7; const sc={}; let t=0;
+      for(const k of CRITERIA){sc[k.k]=Math.max(1,Math.min(5,Math.round(base+rnd()*1.6-.5)));t+=sc[k.k]}
+      const day=Math.min((c-1)*10+3+Math.floor(rnd()*6),daysIn(month));
+      audits.push({month,cycle:c,staffId:id,scores:sc,pct:t/30*100,chats:6+Math.floor(rnd()*14),evaluator:opts.reviewer||'Gokul Sir',date:`${month}-${pad(day)}`,notes:t>=24?'Quick replies and clear package details. Keep it up.':t>=18?'Good tone. Follow up sooner on leads that go quiet.':'Several chats left unanswered. Ask for reports and push for confirmation.',sample:true});
+    });
+  }
+  return {leads,cycles,audits};
+}
+
+/* ================= sign-in (standalone hosting with Firebase) ================= */
+const FB_VER='10.12.2';
+const Auth={
+  on:false, user:null,
+  cfg(){const c=window.MILIFE_FIREBASE;return c&&c.apiKey&&!/PASTE/i.test(c.apiKey)?c:null},
+  load(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=()=>rej(new Error('Could not load '+src));document.head.appendChild(s)})},
+  async start(){
+    const cfg=this.cfg(); if(!cfg)return;
+    const base=`https://www.gstatic.com/firebasejs/${FB_VER}/`;
+    await this.load(base+'firebase-app-compat.js');
+    await Promise.all([this.load(base+'firebase-auth-compat.js'),this.load(base+'firebase-firestore-compat.js')]);
+    firebase.initializeApp(cfg);
+    this.on=true;
+    this.user=await new Promise(r=>{const un=firebase.auth().onAuthStateChanged(u=>{un();r(u)})});
+    if(!this.user)this.user=await this.screen();
+    $('#who').hidden=false; $('#whoEmail').textContent=this.user.email||'';
+    $('#signOut').onclick=()=>firebase.auth().signOut().then(()=>location.reload());
+  },
+  screen(){
+    return new Promise(resolve=>{
+      const box=document.createElement('div'); box.className='login';
+      box.innerHTML=`<form novalidate>
+        <img src="logo.png" alt="MiLife Medicity">
+        <h1>Sales Performance</h1><p>Sign in with your team account.</p>
+        <label>Email<input type="email" id="lgEmail" autocomplete="username" required></label>
+        <label>Password<input type="password" id="lgPass" autocomplete="current-password" required></label>
+        <div class="err" id="lgErr" role="alert"></div>
+        <button class="btn primary" type="submit" id="lgBtn">Sign in</button>
+        <button class="link" type="button" id="lgReset">Forgot password?</button>
+      </form>`;
+      document.body.appendChild(box);
+      const err=box.querySelector('#lgErr'), btn=box.querySelector('#lgBtn');
+      const msg=e=>{const c=String(e&&e.code||'');return /wrong-password|user-not-found|invalid-credential|invalid-login/.test(c)?'Email or password is not right.':/too-many/.test(c)?'Too many tries. Wait a minute and try again.':/network/.test(c)?'No connection. Check your internet.':(e&&e.message)||'Could not sign in.'};
+      box.querySelector('form').addEventListener('submit',async ev=>{
+        ev.preventDefault(); err.textContent=''; btn.disabled=true; btn.textContent='Signing in…';
+        try{const r=await firebase.auth().signInWithEmailAndPassword(box.querySelector('#lgEmail').value.trim(),box.querySelector('#lgPass').value);box.remove();resolve(r.user)}
+        catch(e){err.textContent=msg(e);btn.disabled=false;btn.textContent='Sign in'}
+      });
+      box.querySelector('#lgReset').addEventListener('click',async()=>{
+        const em=box.querySelector('#lgEmail').value.trim(); if(!em){err.textContent='Type your email first, then press Forgot password.';return}
+        try{await firebase.auth().sendPasswordResetEmail(em);err.style.color='var(--good)';err.textContent='Password reset email sent.'}catch(e){err.style.color='';err.textContent=msg(e)}
+      });
+      setTimeout(()=>box.querySelector('#lgEmail').focus(),50);
+    });
+  }
+};
+
+/* ================= storage adapter ================= */
+const Store={
+  db:null, mode:'loading', backend:'none',
+  async init(){
+    if(Auth.on){ this.db=firebase.firestore(); this.mode='db'; this.backend='firebase'; return }
+    let c=window.claude;
+    for(let i=0;i<20&&!(c&&c.use);i++){await new Promise(r=>setTimeout(r,100));c=window.claude}
+    if(!(c&&c.use)){this.mode='memory';return}
+    try{ this.db=await Promise.race([c.use('db'),new Promise(r=>setTimeout(()=>r(null),10000))]) }catch(e){this.db=null}
+    this.mode=this.db?'db':'memory'; if(this.db)this.backend='claude';
+  },
+  norm(d){
+    if(d==null)return null;
+    let data=typeof d.data==='function'?d.data():(d.data!==undefined&&d.data!==null&&typeof d.data==='object'?d.data:d);
+    if(data==null)return null;
+    const id=d.id||(d.ref&&d.ref.id)||data.id||(d.path?String(d.path).split('/').pop():undefined);
+    return Object.assign({},data,{id});
+  },
+  normList(r){
+    let arr=r;
+    if(arr&&!Array.isArray(arr)){
+      if(Array.isArray(arr.docs))arr=arr.docs; else if(Array.isArray(arr.items))arr=arr.items; else if(Array.isArray(arr.results))arr=arr.results; else if(Array.isArray(arr.documents))arr=arr.documents;
+      else if(typeof arr.forEach==='function'){const t=[];arr.forEach(x=>t.push(x));arr=t} else arr=[];
+    }
+    return (arr||[]).map(d=>this.norm(d)).filter(Boolean);
+  },
+  async run(q){
+    if(typeof q.get==='function')return await q.get();
+    if(typeof q.onSnapshot==='function')return await new Promise((res,rej)=>{let un;un=q.onSnapshot(s=>{res(s);try{typeof un==='function'&&setTimeout(un,0)}catch(e){}},rej)});
+    throw new Error('query not supported');
+  },
+  async list(col,field,val){
+    if(!this.db)return [];
+    if(field){
+      try{return this.normList(await this.run(this.db.collection(col).where(field,'==',val)))}catch(e){console.warn('where failed, filtering locally',e)}
+      return this.normList(await this.run(this.db.collection(col))).filter(d=>d[field]===val);
+    }
+    return this.normList(await this.run(this.db.collection(col)));
+  },
+  async get(col,id){
+    if(!this.db)return null;
+    const r=await this.db.collection(col).doc(id).get();
+    if(r&&r.exists===false)return null;
+    if(r&&typeof r.exists==='function'&&!r.exists())return null;
+    return this.norm(r);
+  },
+  async put(col,id,data){ if(!this.db)return; const clean=JSON.parse(JSON.stringify(data)); delete clean.id; await this.db.collection(col).doc(id).set(clean) },
+  async del(col,id){ if(!this.db)return; await this.db.collection(col).doc(id).delete() }
+};
+
+/* ================= state ================= */
+const S={
+  view:'dashboard', month:monthOf(todayStr()),
+  staff:[], settings:JSON.parse(JSON.stringify(DEFAULT_SETTINGS)),
+  chunks:[], audits:[], cycles:{c1:[],c2:[],c3:[]},
+  loaded:false, error:null, animKey:'',
+  boardSort:{k:'score',dir:-1}, boardLang:'All', boardBranch:'All',
+  leadF:{q:'',staff:'',src:'',ch:'',lang:'',st:'',page:0},
+  teamF:{q:'',lang:'',branch:'',status:'active'},
+  cf:{lang:'',src:'',grp:'',ch:'',branch:'',staff:'',tr:'',cycle:'',month:'',camp:''}, cBy:'lang', cSort:{k:'rate',dir:-1}, hmCol:'src',
+  period:{mode:'month'}, auditsAll:{}, campaigns:[], memCycles:{},
+  mkBy:'src', mkSort:{k:'spend',dir:-1}, campSort:{k:'spend',dir:-1}, campQ:'', campSrc:''
+};
+function fmtDateY(d){if(!d)return '';const [y,m,dd]=String(d).split('-');return `${+dd} ${MONTHS[+m-1]} ${y}`}
+function monthsBetween(a,b){const out=[];let m=monthOf(a);const e=monthOf(b);while(m<=e&&out.length<240){out.push(m);m=shiftMonth(m,1)}return out}
+function campEnd(c){return c.end||todayStr()}
+function dataDates(){let min=null,max=null;for(const ch of S.chunks)for(const r of (ch.rows||[])){if(!min||r.d<min)min=r.d;if(!max||r.d>max)max=r.d}for(const c of S.campaigns){if(c.start&&(!min||c.start<min))min=c.start;const e=campEnd(c);if(e&&(!max||e>max))max=e}return {min,max}}
+function curRange(){
+  const t=todayStr(), cur=monthOf(t), P=S.period;
+  if(P.mode==='month')return {from:S.month+'-01',to:`${S.month}-${pad(daysIn(S.month))}`};
+  if(P.mode==='last3')return {from:shiftMonth(cur,-2)+'-01',to:t};
+  if(P.mode==='last6')return {from:shiftMonth(cur,-5)+'-01',to:t};
+  if(P.mode==='year')return {from:t.slice(0,4)+'-01-01',to:t};
+  if(P.mode==='all'){const d=dataDates();return {from:d.min&&d.min<t?d.min:t,to:d.max&&d.max>t?d.max:t}}
+  return {from:P.from||t,to:P.to||t};
+}
+function periodLabel(){const P=S.period;if(P.mode==='month')return monthLabel(S.month);const lab={last3:'Last 3 months',last6:'Last 6 months',year:'This year',all:'All time'}[P.mode];if(lab)return lab;const r=curRange();return `${fmtDateY(r.from)} – ${fmtDateY(r.to)}`}
+function rangeText(){const r=curRange();return `${fmtDateY(r.from)} – ${fmtDateY(r.to)}`}
+function isMulti(){return S.period.mode!=='month'&&monthsBetween(curRange().from,curRange().to).length>1}
+function auditsInRange(){const r=curRange();let out=[];for(const m of monthsBetween(r.from,r.to))out=out.concat(S.auditsAll[m]||[]);return out}
+function leadsOfMonth(){const rg=curRange();const out=[];for(const ch of S.chunks)for(const r of (ch.rows||[])){if(r.d<rg.from||r.d>rg.to)continue;out.push(Object.assign({_c:ch.id,_sample:!!ch.sample},r,{st:r.st==='Converted'?'Confirmed':r.st,ch:r.ch||'WhatsApp'}))}return out}
+function staffById(id){return S.staff.find(p=>p.id===id)}
+function hasSample(){return S.chunks.some(c=>c.sample)||S.campaigns.some(c=>c.sample)||Object.values(S.auditsAll).some(l=>l.some(a=>a.sample))}
+
+async function loadAll(){
+  S.loaded=false;S.error=null;render();
+  const timer=new Promise((_,rej)=>setTimeout(()=>rej(new Error('Loading took longer than 10 seconds.')),10000));
+  try{
+    await Promise.race([(async()=>{
+      if(Store.mode==='loading')await Store.init();
+      if(Store.mode==='db'){
+        const [staff,cfg]=await Promise.all([Store.list('staff'),Store.get('config','main').catch(()=>null)]);
+        S.staff=staff.map(p=>Object.assign(p,{langs:langsOf(p)})).sort((a,b)=>a.name.localeCompare(b.name));
+        if(cfg)S.settings=mergeSettings(cfg);
+      }else if(!S.staff.length){
+        S.staff=OFFLINE_ROSTER.split('\n').map(parseLabel).filter(Boolean).map(p=>Object.assign(p,{id:normTxt(p.name).replace(/ /g,'-')}));
+        S.staff[9].langs=['Arabic','Malayalam']; S.staff[14].langs=['Malayalam','English'];
+      }
+      await loadMonth();
+    })(),timer]);
+    S.loaded=true;
+  }catch(e){console.error(e);S.error=e.message||String(e)}
+  render();
+}
+function mergeSettings(cfg){
+  const s=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+  if(cfg.weights){Object.assign(s.weights,cfg.weights); if(cfg.weights.conversions!=null&&cfg.weights.confirmations==null)s.weights.confirmations=cfg.weights.conversions; delete s.weights.conversions}
+  for(const k of ['minLeads','target','confirmWords','currency'])if(cfg[k]!==undefined)s[k]=cfg[k];
+  for(const k of ['languages','channels','reviewers','regions','creatives'])if(Array.isArray(cfg[k])&&cfg[k].length)s[k]=cfg[k];
+  if(Array.isArray(cfg.platforms)&&cfg.platforms.length)s.platforms=cfg.platforms.map(p=>typeof p==='string'?{n:p,g:'Other'}:p);
+  return s;
+}
+async function loadMonth(){
+  if(Store.mode==='db'){
+    const [chunks,camps]=await Promise.all([Store.list('leads'),Store.list('campaigns').catch(()=>[])]);
+    S.chunks=chunks; S.campaigns=camps.map(normCamp); S.auditsAll={};
+  }else memInit();
+  await loadAudits();
+}
+async function loadAudits(){
+  const r=curRange(); const months=new Set(monthsBetween(r.from,r.to)); months.add(S.month);
+  if(Store.mode==='db'){
+    const need=[...months].filter(m=>!S.auditsAll[m]);
+    const res=await Promise.all(need.map(m=>Store.list('audits','month',m)));
+    need.forEach((m,i)=>S.auditsAll[m]=res[i]);
+    const cyc=await Store.get('cycles',S.month).catch(()=>null);
+    S.cycles={c1:(cyc&&cyc.c1)||[],c2:(cyc&&cyc.c2)||[],c3:(cyc&&cyc.c3)||[]};
+  }else{
+    for(const m of months)S.auditsAll[m]=S.auditsAll[m]||[];
+    S.cycles=S.memCycles[S.month]||(S.memCycles[S.month]={c1:[],c2:[],c3:[]});
+  }
+  S.audits=S.auditsAll[S.month]||(S.auditsAll[S.month]=[]);
+}
+function memInit(){
+  if(S._memInit)return; S._memInit=true;
+  const cur=monthOf(todayStr());
+  for(const m of [shiftMonth(cur,-2),shiftMonth(cur,-1),cur]){
+    const isCur=m===cur; const smp=makeSample(S.staff,m,{leads:isCur?90:120,days:isCur?+todayStr().slice(8):daysIn(m),cycles:isCur?Math.max(1,currentCycle(m)-1):3,pending:isCur?2:0,salt:m});
+    S.chunks.push({id:m+'_sample',month:m,kind:'sample',sample:true,rows:smp.leads});
+    S.auditsAll[m]=smp.audits.map(a=>Object.assign({id:m+'_'+a.staffId},a)); S.memCycles[m]=smp.cycles;
+  }
+  S.campaigns=makeCampaigns();
+}
+async function save(col,id,data){
+  try{ await Store.put(col,id,data); return true }catch(e){console.error(e);toast('Could not save: '+(e.message||'permission or network problem'));return false}
+}
+
+
+/* ================= rendering ================= */
+function render(){
+  document.querySelectorAll('.mi').forEach(b=>b.setAttribute('aria-current',b.dataset.go===S.view?'page':'false'));
+  const sync=$('#sync'); sync.className='sync'+(Store.mode==='db'?'':' off'); sync.querySelector('span').textContent=Store.mode==='db'?'Saved to the cloud':Store.mode==='loading'?'Connecting…':'Preview only, not saved';
+  $('#revName').textContent=(S.settings.reviewers||[])[0]||'—';
+  const app=$('#app');
+  if(S.error){app.className='main';app.innerHTML=`<div class="card empty"><img src="emblem.png" alt=""><h2>Couldn't load the data</h2><p>${esc(S.error)} Check your connection and try again.</p><button class="btn primary" data-act="retry">Try again</button></div>`;return}
+  if(!S.loaded){app.className='main';app.innerHTML='<div class="loading"><img src="emblem.png" alt="">Loading your sales data…</div>';return}
+  const pend=pendingAudits(); const ac=$('#auditCnt'); ac.hidden=!pend; ac.textContent=pend;
+  let top='';
+  if(Store.mode!=='db')top+=`<div class="banner offline"><span class="sp">Preview mode: no database is connected, so changes last only until you close the page. Add your Firebase settings to config.js to save (see README).</span></div>`;
+  if(Store.backend==='firebase'&&!S.staff.length)top+=`<div class="banner seed"><span class="sp"><b>Your database is empty.</b> Load the 40-person MiLife sales team to get started. You can edit or remove people later.</span><button class="btn sm primary" data-act="seedStaff">Load sales team</button></div>`;
+  if(hasSample()&&S.view!=='setup'&&S.view!=='team')top+=`<div class="banner sample"><span class="sp"><b>Sample data.</b> The leads, campaigns and reviews are examples, so you can see how everything works. Remove them in Settings once your real leads are in.</span><button class="btn sm" data-go="setup">Go to Settings</button></div>`;
+  const views={dashboard:vDashboard,closing:vClosing,marketing:vMarketing,leads:vLeads,audits:vAudits,team:vTeam,setup:vSetup};
+  const key=S.view+'|'+S.month+'|'+periodLabel();
+  app.className='main'+(key!==S.animKey?' enter':'');
+  const first=key!==S.animKey; S.animKey=key;
+  app.innerHTML=(views[S.view]||vDashboard)().replace('<!--banner-->',top);
+  if(first)countUp();
+}
+function countUp(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  document.querySelectorAll('[data-cu]').forEach(el=>{
+    const to=parseFloat(el.dataset.cu), dec=+el.dataset.dec||0, suf=el.dataset.suf||''; if(!isFinite(to)||to===0)return;
+    const t0=performance.now(), dur=800;
+    const step=t=>{const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.textContent=(to*e).toFixed(dec)+suf; if(k<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step);
+  });
+}
+function cu(v,dec=0,suf=''){return `<span data-cu="${v}" data-dec="${dec}" data-suf="${suf}">${(+v).toFixed(dec)}${suf}</span>`}
+function pendingAudits(){const done=new Set(S.audits.map(a=>a.staffId));return [...S.cycles.c1,...S.cycles.c2,...S.cycles.c3].filter(id=>!done.has(id)&&staffById(id)).length}
+function monthSw(){return `<div class="monthsw" aria-label="Month"><button data-act="mPrev" aria-label="Previous month">${IC.left}</button><span class="num">${monthLabel(S.month)}</span><button data-act="mNext" aria-label="Next month">${IC.right}</button></div>`}
+function periodSw(){const P=S.period;
+  return `<div class="period"><select id="periodSel" aria-label="Period">${[['month','Single month'],['last3','Last 3 months'],['last6','Last 6 months'],['year','This year'],['all','All time'],['custom','Custom range']].map(([v,t])=>`<option value="${v}" ${P.mode===v?'selected':''}>${t}</option>`).join('')}</select>${P.mode==='month'?monthSw():P.mode==='custom'?`<div class="range"><input type="date" id="pFrom" value="${esc(P.from||'')}" aria-label="From"><span>to</span><input type="date" id="pTo" value="${esc(P.to||'')}" aria-label="To"><button class="btn sm primary" data-act="pApply">Apply</button></div>`:`<span class="plabel num">${esc(rangeText())}</span>`}</div>`}
+function header(title,sub,actions='',sw='period'){return `<div class="ph"><div><h1>${title}</h1>${sub?`<p>${sub}</p>`:''}</div><div class="ph-r">${actions}${sw==='period'?periodSw():sw==='month'?monthSw():''}</div></div><!--banner-->`}
+
+function stackBar(segs,max){const tot=segs.reduce((s,x)=>s+x[1],0);return `<div class="track"><div class="stack" style="width:${max?tot/max*100:0}%">${segs.filter(x=>x[1]).map(([c,v,t])=>`<i style="width:${tot?v/tot*100:0}%;background:${c}" title="${esc(t||'')}: ${v}"></i>`).join('')}</div></div>`}
+function bars(items,total,colorFn){
+  if(!items.length)return '<p class="note">No leads yet for this month.</p>';
+  const max=Math.max(...items.map(i=>i[1]),1);
+  return `<div class="bars">${items.map(([k,v])=>`<div class="brow"><span class="bn" title="${esc(k)}">${esc(k)}</span>${stackBar([[colorFn?colorFn(k):'var(--teal)',v,k]],max)}<span class="bv num">${v}${total?`<small>${fmtPct(pct(v,total))}</small>`:''}</span></div>`).join('')}</div>`;
+}
+
+/* ---------- dashboard ---------- */
+function vDashboard(){
+  const leads=leadsOfMonth(), audits=auditsInRange(), multi=isMulti(), rng=curRange();
+  const total=leads.length, conf=leads.filter(l=>l.st==='Confirmed').length;
+  const activeN=S.staff.filter(p=>p.active!==false).length;
+  const audited=new Set(audits.map(a=>a.staffId)).size;
+  const board=computeBoard(S.staff,leads,audits,S.settings);
+  const cur=currentCycle(S.month);
+  // languages
+  const L={}; for(const l of leads)L[l.lang]=(L[l.lang]||0)+1;
+  const langItems=S.settings.languages.map(l=>[l,L[l]||0]).concat(Object.keys(L).filter(l=>!S.settings.languages.includes(l)).map(l=>[l,L[l]]));
+  const ml=L.Malayalam||0, ar=L.Arabic||0;
+  // platforms x channels
+  const P={}; const CH={}; const G={};
+  for(const l of leads){(P[l.src]=P[l.src]||{t:0,ch:{}}).t++; P[l.src].ch[l.ch]=(P[l.src].ch[l.ch]||0)+1; CH[l.ch]=(CH[l.ch]||0)+1; const g=groupOf(l.src); G[g]=(G[g]||0)+1}
+  const pItems=Object.entries(P).sort((a,b)=>b[1].t-a[1].t); const pMax=Math.max(1,...pItems.map(x=>x[1].t));
+  const chList=S.settings.channels.concat(Object.keys(CH).filter(c=>!S.settings.channels.includes(c)));
+  // cycles
+  const cyc=(multi?monthsBetween(rng.from,rng.to).map(m=>[m,MONTHS[+m.slice(5)-1]+' '+m.slice(2,4),l=>monthOf(l.d)===m]):[1,2,3].map(c=>[c,cycleRange(S.month,c),l=>cycleOfDay(+String(l.d).slice(8))===c])).map(([c,label,fn])=>{const ls=leads.filter(fn);const by={};for(const l of ls)by[l.lang]=(by[l.lang]||0)+1;return {c,label,n:ls.length,by,cv:ls.filter(l=>l.st==='Confirmed').length}});
+  const cmax=Math.max(1,...cyc.map(x=>x.n));
+  // highlights
+  const minL=+S.settings.minLeads||1;
+  const scored=board.filter(b=>b.score!=null);
+  const topP=scored[0];
+  const closer=board.filter(b=>b.n>=minL).sort((a,b)=>b.rate-a.rate||b.c-a.c)[0];
+  const most=board.slice().sort((a,b)=>b.c-a.c||b.rate-a.rate)[0];
+  const bestAudit=board.filter(b=>b.audit!=null).sort((a,b)=>b.audit-a.audit)[0];
+  const hl=(k,b,why,cls='')=>`<div class="hl ${cls}">${b?avatar(b.p,true):'<span class="av lg">–</span>'}<div><span class="k">${k}</span>${b?`<button class="namebtn who" data-act="person" data-id="${b.p.id}">${esc(b.p.name)}</button><span class="why">${why}</span>`:'<span class="why">Not enough data yet</span>'}</div></div>`;
+  const attention=board.filter(b=>(b.score!=null&&b.score<55)||(b.audit!=null&&b.audit<50)||(b.n>=minL&&b.c===0)).slice(-6).reverse();
+  const branches=['All',...[...new Set(S.staff.map(p=>p.branch))].sort()];
+  const cycleTxt=cur>=1&&cur<=3?`Cycle ${cur} of 3 · ${cycleRange(S.month,cur)}`:cur===4?'Month closed':'Month not started';
+  return `${header('Dashboard','')}
+  <section class="hero">
+    <div style="position:relative;z-index:1"><span class="eb">${esc(periodLabel())}${S.period.mode==='month'?' · '+cycleTxt:S.period.mode==='custom'?'':' · '+esc(rangeText())}</span>
+      <h1>${total?`${total} leads, ${conf} confirmed`:'No leads yet this month'}</h1>
+      <p>${total?`${fmtPct(pct(conf,total),1)} confirmation rate across ${activeN} people. ${audited} of ${activeN} WhatsApp reviews done.`:'Import your lead sheet or add leads to see the month take shape.'}</p>
+      <div class="toolbar" style="margin-top:16px"><button class="btn gold sm" data-act="import">${IC.up}Import leads</button><button class="btn ghost-w sm" data-go="audits">Open WhatsApp audits</button></div>
+    </div>
+    <div class="hero-stats"><div class="hs gold"><b class="num">${cu(conf)}</b><span>Confirmed</span></div><div class="hs"><b class="num">${cu(pct(conf,total),1,'%')}</b><span>Confirmation rate</span></div></div>
+  </section>
+  <section class="grid g-tiles">
+    <div class="tile"><span class="lbl"><i style="background:var(--teal)"></i>Total leads</span><span class="val num">${cu(total)}</span><span class="sub">All platforms</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--c-ml)"></i>Malayalam leads</span><span class="val num">${cu(ml)}</span><span class="sub">${fmtPct(pct(ml,total))} of leads</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--c-ar)"></i>Arabic leads</span><span class="val num">${cu(ar)}</span><span class="sub">${fmtPct(pct(ar,total))} of leads</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--good)"></i>Confirmed</span><span class="val num">${cu(conf)}</span><span class="sub">${leads.filter(l=>l.st==='Follow-up').length} more in follow-up</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>WhatsApp reviews</span><span class="val num">${cu(audited)}<span class="muted" style="font-size:18px">/${activeN}</span></span><span class="sub">${pendingAudits()} picked, waiting for review</span></div>
+  </section>
+  <section class="grid g-4">
+    ${hl('Top performer',topP,topP?`Score ${Math.round(topP.score)} · ${topP.c} confirmed of ${topP.n}`:'','star')}
+    ${hl('Best closer',closer,closer?`${fmtPct(closer.rate*100,1)} confirmation rate (${closer.c} of ${closer.n})`:'')}
+    ${hl('Most confirmations',most&&most.c?most:null,most?`${most.c} patients confirmed`:'')}
+    ${hl('Best on WhatsApp',bestAudit,bestAudit?`Review score ${Math.round(bestAudit.audit)}/100`:'')}
+  </section>
+  ${(()=>{const bl=bestBy(leads,'lang'),bs=bestBy(leads,'src'),bc=bestBy(leads,'ch');const t=(k,g,d)=>`<div class="grp"><span>${k}</span><b>${g?esc(g.label):'–'}</b><span class="note">${g?fmtPct(g.rate*100,1)+' confirmed ('+g.c+' of '+g.n+')':'Not enough leads'}</span></div>`;
+    return `<section class="card"><div class="card-h"><div><h2>Who is closing best</h2><p>Confirmation rate by language, platform and channel, ${esc(S.period.mode==='month'?'this month':periodLabel())}</p></div><button class="btn primary sm" data-go="closing">Open closing analysis</button></div><div class="groups" style="margin:0">${t('Best language',bl,'lang')}${t('Best platform',bs,'src')}${t('Best channel',bc,'ch')}</div></section>`})()}
+  ${(()=>{const {rows}=campStats();if(!rows.length)return '';const sp=rows.reduce((a,r)=>a+r.spend,0),ld=rows.reduce((a,r)=>a+r.leads,0),cf=rows.reduce((a,r)=>a+r.conf,0);const bp=mkBest(mkGroup(rows,'src'));
+    return `<section class="card"><div class="card-h"><div><h2>Marketing</h2><p>Ad spend, leads and cost per lead, ${esc(periodLabel().toLowerCase()==='all time'?'all time':'for '+periodLabel())}</p></div><button class="btn primary sm" data-go="marketing">Open marketing</button></div><div class="groups" style="margin:0"><div class="grp"><span>Ad spend</span><b class="num">${fmtMoney(sp,true)}</b><span class="note">${rows.length} campaigns</span></div><div class="grp"><span>Cost per lead</span><b class="num">${ld>=.5?fmtMoney(sp/ld):'–'}</b><span class="note">${Math.round(ld)} leads</span></div><div class="grp"><span>Cost per confirmation</span><b class="num">${cf?fmtMoney(sp/cf):'–'}</b><span class="note">${Math.round(cf)} confirmed</span></div><div class="grp"><span>Best platform</span><b>${bp?esc(bp.k):'–'}</b><span class="note">${bp?fmtMoney(bp.cpl)+' per lead':'Not enough data'}</span></div></div></section>`})()}
+  <section class="card">
+    <div class="card-h"><div><h2>Where leads came from</h2><p>Each platform, split by how the lead reached the team</p></div>
+      <div class="legend">${chList.filter(c=>CH[c]).map(c=>`<span><i class="dot" style="background:${chColor(c)}"></i>${esc(c)} ${CH[c]}</span>`).join('')}</div></div>
+    <div class="groups">${GROUPS.filter(g=>G[g]).map(g=>`<div class="grp"><b class="num">${G[g]}</b><span>${g} · ${fmtPct(pct(G[g],total))}</span></div>`).join('')||'<p class="note">No leads yet for this month.</p>'}</div>
+    <div class="bars">${pItems.map(([k,v])=>`<div class="brow"><span class="bn" title="${esc(k)}">${esc(k)}</span>${stackBar(chList.map(c=>[chColor(c),v.ch[c]||0,c]),pMax)}<span class="bv num">${v.t}<small>${fmtPct(pct(v.t,total))}</small></span></div>`).join('')}</div>
+  </section>
+  <section class="grid g-2">
+    <div class="card"><div class="card-h"><div><h2>Leads by language</h2><p>Language the patient spoke</p></div></div>${bars(langItems.filter(x=>x[1]||['Malayalam','Arabic'].includes(x[0])),total,langColor)}</div>
+    <div class="card"><div class="card-h"><div><h2>${multi?'Leads by month':'Leads by 10-day cycle'}</h2><p>With confirmations in each ${multi?'month':'cycle'}</p></div></div>
+      <div class="bars">${cyc.map(x=>`<div class="brow"><span class="bn">${esc(x.label)}</span>${stackBar(langItems.map(([l])=>[langColor(l),x.by[l]||0,l]),cmax)}<span class="bv num">${x.n}<small>${x.cv} conf.</small></span></div>`).join('')}</div>
+      <div class="legend" style="margin-top:14px">${langItems.filter(x=>x[1]).map(([l])=>`<span><i class="dot" style="background:${langColor(l)}"></i>${esc(l)}</span>`).join('')}</div>
+    </div>
+  </section>
+  <section class="card">
+    <div class="card-h"><div><h2>Team leaderboard</h2><p>Score out of 100 from the WhatsApp review, confirmations, confirmation rate and lead volume</p></div>
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Language">${['All',...S.settings.languages].map(t=>`<button data-act="boardLang" data-v="${esc(t)}" aria-pressed="${S.boardLang===t}">${esc(t)}</button>`).join('')}</div>
+        <select id="boardBranch" aria-label="Branch">${branches.map(b=>`<option value="${esc(b)}" ${S.boardBranch===b?'selected':''}>${b==='All'?'All branches':esc(b)}</option>`).join('')}</select>
+        <button class="btn sm" data-act="exportBoard">${IC.down}CSV</button>
+      </div></div>
+    ${boardTable(board)}
+  </section>
+  ${attention.length?`<section class="card"><div class="card-h"><div><h2>Needs attention</h2><p>Low score, weak WhatsApp review, or leads with no confirmations</p></div></div><div class="grid g-3">${attention.map(b=>`<div class="prow"><span class="pn">${avatar(b.p)}<button class="namebtn" data-act="person" data-id="${b.p.id}">${esc(b.p.name)}</button></span><span class="pa">${b.audit!=null&&b.audit<50?'<span class="chip bad">Review '+Math.round(b.audit)+'</span>':''}${b.n>=minL&&b.c===0?'<span class="chip warn">0 of '+b.n+'</span>':''}${b.score!=null&&b.score<55?'<span class="chip bad">Score '+Math.round(b.score)+'</span>':''}</span></div>`).join('')}</div></section>`:''}`;
+}
+function boardRows(board){
+  let rows=board.filter(b=>(S.boardLang==='All'||langsOf(b.p).includes(S.boardLang))&&(S.boardBranch==='All'||b.p.branch===S.boardBranch));
+  const {k,dir}=S.boardSort;
+  const val=b=>k==='name'?b.p.name:k==='n'?b.n:k==='c'?b.c:k==='rate'?b.rate:k==='audit'?(b.audit??-1):(b.score??-1);
+  return rows.slice().sort((a,b)=>{const x=val(a),y=val(b);return (typeof x==='string'?x.localeCompare(y):x-y)*dir});
+}
+function boardTable(board){
+  const rows=boardRows(board);
+  if(!rows.length)return '<div class="empty">No team members match this filter.</div>';
+  const th=(k,t,r='')=>`<th class="sortable ${r}" data-act="sort" data-k="${k}" aria-sort="${S.boardSort.k===k?(S.boardSort.dir>0?'ascending':'descending'):'none'}">${t}${S.boardSort.k===k?(S.boardSort.dir>0?' ↑':' ↓'):''}</th>`;
+  return `<div class="tbl-wrap"><table><thead><tr><th>#</th>${th('name','Person')}<th>Languages</th>${th('n','Leads','r')}${th('c','Confirmed','r')}${th('rate','Conf. rate','r')}${th('audit','WhatsApp','r')}${th('score','Score','r')}<th>Grade</th></tr></thead><tbody>
+  ${rows.map(b=>`<tr><td>${b.rank?`<span class="rank ${b.rank<=3?'r'+b.rank:''}">${b.rank}</span>`:'<span class="rank">–</span>'}</td>
+    <td><div class="who-cell">${avatar(b.p)}<div><button class="namebtn" data-act="person" data-id="${b.p.id}">${esc(b.p.name)}</button><small>${esc(b.p.role)} · ${esc(b.p.branch)}${b.p.active===false?' · inactive':''}</small></div></div></td>
+    <td>${langChips(b.p)}</td>
+    <td class="r num">${b.n}</td><td class="r num"><b>${b.c}</b></td><td class="r num">${b.n?fmtPct(b.rate*100,1):'–'}</td>
+    <td class="r num">${b.audit!=null?Math.round(b.audit):'<span class="note">Pending</span>'}</td>
+    <td class="r"><div class="scorebar"><b class="num">${b.score!=null?Math.round(b.score):'–'}</b>${stackBar([[b.score>=85?'var(--gold)':'var(--teal)',b.score||0]],100)}</div></td>
+    <td><span class="chip ${b.grade.c}">${b.grade.t}</span>${b.provisional&&b.score!=null?' <span class="chip mute" title="WhatsApp review not done yet this month">Provisional</span>':''}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+/* ---------- closing analysis ---------- */
+const DIMS={
+  lang:{t:'Language',v:l=>l.lang,lab:v=>v},
+  src:{t:'Platform',v:l=>l.src,lab:v=>v},
+  grp:{t:'Platform group',v:l=>groupOf(l.src),lab:v=>v},
+  ch:{t:'Channel',v:l=>l.ch,lab:v=>v},
+  branch:{t:'Branch',v:l=>(staffById(l.s)||{}).branch||'—',lab:v=>v},
+  staff:{t:'Person',v:l=>l.s,lab:v=>(staffById(v)||{}).name||'Unknown'},
+  tr:{t:'Treatment',v:l=>l.tr||'—',lab:v=>v},
+  cycle:{t:'10-day cycle',v:l=>String(cycleOfDay(+String(l.d).slice(8))),lab:v=>S.period.mode==='month'?cycleRange(S.month,+v):({1:'Days 1–10',2:'Days 11–20',3:'Days 21–31'})[v]},
+  month:{t:'Month',v:l=>monthOf(l.d),lab:v=>monthLabel(v)},
+  camp:{t:'Campaign',v:l=>l.camp||'',lab:v=>v?((S.campaigns.find(c=>c.id===v)||{}).name||'Deleted campaign'):'Not tagged'}
+};
+const ST_COL={New:'var(--ch-other)',Contacted:'var(--c-en)','Follow-up':'var(--warn)',Confirmed:'var(--good)',Lost:'var(--bad)'};
+function applyCF(leads,skip){return leads.filter(l=>Object.entries(S.cf).every(([d,v])=>!v||d===skip||DIMS[d].v(l)===v))}
+function groupStats(leads,dim){
+  const m={};
+  for(const l of leads){const k=DIMS[dim].v(l);const g=m[k]||(m[k]={k,n:0,c:0,fu:0,lost:0,ct:0,nw:0});g.n++;if(l.st==='Confirmed')g.c++;else if(l.st==='Follow-up')g.fu++;else if(l.st==='Lost')g.lost++;else if(l.st==='Contacted')g.ct++;else g.nw++}
+  return Object.values(m).map(g=>Object.assign(g,{rate:g.n?g.c/g.n:0,label:DIMS[dim].lab(g.k)}));
+}
+function bestBy(leads,dim){const minL=+S.settings.minLeads||1;return groupStats(leads,dim).filter(g=>g.n>=minL).sort((a,b)=>b.rate-a.rate||b.c-a.c)[0]}
+function vClosing(){
+  const all=leadsOfMonth(), f=S.cf, minL=+S.settings.minLeads||1;
+  const leads=applyCF(all);
+  const n=leads.length, c=leads.filter(l=>l.st==='Confirmed').length, fu=leads.filter(l=>l.st==='Follow-up').length, lost=leads.filter(l=>l.st==='Lost').length;
+  const rate=pct(c,n), allRate=pct(all.filter(l=>l.st==='Confirmed').length,all.length);
+  const active=Object.entries(f).filter(([,v])=>v);
+  // filter selects: options counted within the other active filters
+  const filt=Object.keys(DIMS).map(d=>{
+    const opts=groupStats(applyCF(all,d),d).sort((a,b)=>b.n-a.n);
+    if(f[d]&&!opts.some(o=>o.k===f[d]))opts.unshift({k:f[d],label:DIMS[d].lab(f[d]),n:0});
+    return `<label class="f">${DIMS[d].t}<select data-cf="${d}"><option value="">All</option>${opts.map(o=>`<option value="${esc(o.k)}" ${f[d]===o.k?'selected':''}>${esc(o.label)} · ${o.n}</option>`).join('')}</select></label>`}).join('');
+  // grouped table
+  const by=S.cBy, {k:sk,dir}=S.cSort;
+  const rows=groupStats(leads,by).sort((a,b)=>{const x=sk==='label'?a.label:a[sk],y=sk==='label'?b.label:b[sk];return (typeof x==='string'?x.localeCompare(y):(x-y))*dir||b.n-a.n});
+  const fair=rows.filter(r=>r.n>=minL); const best=fair.slice().sort((a,b)=>b.rate-a.rate)[0]; const maxRate=Math.max(.0001,...rows.map(r=>r.rate));
+  const th=(k,t,r='')=>`<th class="sortable ${r}" data-act="cSort" data-k="${k}">${t}${sk===k?(dir>0?' ↑':' ↓'):''}</th>`;
+  const delta=r=>{if(r.n<minL)return '<span class="delta flat">few leads</span>';const d=r.rate*100-rate;const cls=Math.abs(d)<1?'flat':d>0?'up':'down';return `<span class="delta ${cls}">${d>0?'+':''}${d.toFixed(1)} pts</span>`};
+  // heatmap language x platform/channel/group
+  const colDim=S.hmCol;
+  const hmRows=groupStats(leads,'lang').sort((a,b)=>b.n-a.n).map(g=>g.k);
+  const hmCols=groupStats(leads,colDim).sort((a,b)=>b.n-a.n).slice(0,9).map(g=>g.k);
+  const cellStats={}; for(const l of leads){const key=l.lang+'|'+DIMS[colDim].v(l);const s=cellStats[key]||(cellStats[key]={n:0,c:0});s.n++;if(l.st==='Confirmed')s.c++}
+  const hmMax=Math.max(.0001,...Object.values(cellStats).filter(s=>s.n>=Math.min(3,minL)).map(s=>s.c/s.n));
+  const cell=(r,col)=>{const s=cellStats[r+'|'+col];if(!s)return '<td><div class="cell none">–</div></td>';const rt=s.c/s.n;const a=Math.round(12+Math.min(1,rt/hmMax)*68);
+    return `<td><div class="cell ${s.n<3?'few':''}" data-act="cCell" data-a="${esc(r)}" data-b="${esc(col)}" style="background:color-mix(in srgb,var(--good) ${a}%,var(--surface));color:${a>55?'#fff':'var(--ink)'}" title="${esc(r)} · ${esc(DIMS[colDim].lab(col))}: ${s.c} confirmed of ${s.n}"><b>${Math.round(rt*100)}%</b><small>${s.c}/${s.n}</small></div></td>`};
+  // status funnel
+  const stc={}; for(const l of leads)stc[l.st]=(stc[l.st]||0)+1;
+  const bLang=bestBy(leads,'lang'), bSrc=bestBy(leads,'src'), bCh=bestBy(leads,'ch'), bP=bestBy(leads,'staff');
+  const hlc=(k,g,dim)=>`<div class="hl"><div><span class="k">${k}</span>${g?`<button class="namebtn who" data-act="cDrill" data-d="${dim}" data-v="${esc(g.k)}">${esc(g.label)}</button><span class="why">${fmtPct(g.rate*100,1)} confirmed · ${g.c} of ${g.n} leads</span>`:'<span class="why">Needs at least '+minL+' leads per group</span>'}</div></div>`;
+  return `${header('Closing analysis','See which language, platform, channel, branch or person turns leads into confirmations. Filter on anything, then compare by any field. Click a row or a grid cell to drill in.',`<button class="btn sm" data-act="exportClosing">${IC.down}CSV</button>`)}
+  <section class="card">
+    <div class="card-h" style="margin-bottom:12px"><div><h2>Filters</h2><p>${active.length?'Showing leads that match every filter':'Showing every lead this month'}</p></div>
+      ${active.length?`<div class="fchips">${active.map(([d,v])=>`<button class="fchip" data-act="cRemove" data-d="${d}" title="Remove filter">${DIMS[d].t}: ${esc(DIMS[d].lab(v))}<span>✕</span></button>`).join('')}<button class="btn sm" data-act="cClear">Clear all</button></div>`:''}</div>
+    <div class="fbar">${filt}</div>
+  </section>
+  <section class="grid g-tiles">
+    <div class="tile"><span class="lbl"><i></i>Leads</span><span class="val num">${cu(n)}</span><span class="sub">${active.length?fmtPct(pct(n,all.length))+' of the month':'All leads this month'}</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--good)"></i>Confirmed</span><span class="val num">${cu(c)}</span><span class="sub">${n-c-lost} still open</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>Confirmation rate</span><span class="val num">${cu(rate,1,'%')}</span><span class="sub">${active.length?`Month average ${fmtPct(allRate,1)}`:'Confirmed ÷ leads'}</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--warn)"></i>In follow-up</span><span class="val num">${cu(fu)}</span><span class="sub">Could still confirm</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--bad)"></i>Lost</span><span class="val num">${cu(lost)}</span><span class="sub">${fmtPct(pct(lost,n))} of these leads</span></div>
+  </section>
+  <section class="grid g-4">${hlc('Best language',bLang,'lang')}${hlc('Best platform',bSrc,'src')}${hlc('Best channel',bCh,'ch')}${hlc('Best closer',bP,'staff')}</section>
+  <section class="card">
+    <div class="card-h"><div><h2>Compare by ${DIMS[by].t.toLowerCase()}</h2><p>${n} leads · groups with fewer than ${minL} leads are marked "few leads" and left out of "best"</p></div>
+      <div class="seg" role="group" aria-label="Compare by">${Object.keys(DIMS).map(d=>`<button data-act="cBy" data-v="${d}" aria-pressed="${by===d}">${DIMS[d].t}</button>`).join('')}</div></div>
+    ${rows.length?`<div class="tbl-wrap"><table><thead><tr>${th('label',DIMS[by].t)}${th('n','Leads','r')}${th('c','Confirmed','r')}${th('rate','Confirmation rate')}<th>vs average</th>${th('fu','Follow-up','r')}${th('lost','Lost','r')}<th class="r">Share of confirmations</th></tr></thead><tbody>
+    ${rows.map(r=>`<tr class="drill" data-act="cDrill" data-d="${by}" data-v="${esc(r.k)}" title="Filter by ${esc(r.label)}">
+      <td><b>${by==='staff'&&staffById(r.k)?`<span class="who-cell">${avatar(staffById(r.k))}${esc(r.label)}</span>`:by==='lang'?`<span class="lg"><i style="background:${langColor(r.k)}"></i>${esc(r.label)}</span>`:by==='ch'?`<span class="lg"><i style="background:${chColor(r.k)}"></i>${esc(r.label)}</span>`:esc(r.label)}</b>${best&&best.k===r.k?' <span class="chip star">Best rate</span>':''}</td>
+      <td class="r num">${r.n}</td><td class="r num"><b>${r.c}</b></td>
+      <td><div class="ratebar"><div class="track"><div class="stack" style="width:${r.rate/maxRate*100}%"><i style="width:100%;background:${best&&best.k===r.k?'var(--gold)':'var(--good)'}"></i></div></div><b class="num">${fmtPct(r.rate*100,1)}</b></div></td>
+      <td>${delta(r)}</td><td class="r num">${r.fu}</td><td class="r num">${r.lost}</td><td class="r num">${fmtPct(pct(r.c,c))}</td></tr>`).join('')}
+    </tbody></table></div>`:'<div class="empty"><img src="emblem.png" alt=""><h2>No leads match these filters</h2><p>Remove a filter to see more.</p></div>'}
+  </section>
+  <section>
+    <div class="card"><div class="card-h"><div><h2>Language × ${DIMS[colDim].t.toLowerCase()}</h2><p>Confirmation rate in each combination, with confirmed/leads. Darker green closes better. Faded cells have fewer than 3 leads.</p></div>
+      <div class="seg" role="group" aria-label="Grid columns">${['src','grp','ch','branch','tr'].map(d=>`<button data-act="hmCol" data-v="${d}" aria-pressed="${colDim===d}">${DIMS[d].t}</button>`).join('')}</div></div>
+      ${hmRows.length?`<div class="tbl-wrap" style="border:0"><table class="hm"><thead><tr><th></th>${hmCols.map(col=>`<th>${esc(DIMS[colDim].lab(col))}</th>`).join('')}</tr></thead><tbody>${hmRows.map(r=>`<tr><th><span class="lg"><i style="background:${langColor(r)}"></i>${esc(r)}</span></th>${hmCols.map(col=>cell(r,col)).join('')}</tr>`).join('')}</tbody></table></div>`:'<p class="note">No leads to show.</p>'}
+    </div>
+  </section>
+  <section class="grid g-2">
+    <div class="card"><div class="card-h"><div><h2>Where these leads stand</h2><p>Status of every lead in the current filter</p></div></div>
+      <div class="track" style="height:18px">${n?`<div class="stack" style="width:100%">${STATUSES.map(st=>stc[st]?`<i style="width:${pct(stc[st],n)}%;background:${ST_COL[st]}" title="${st}: ${stc[st]}"></i>`:'').join('')}</div>`:''}</div>
+      <div class="bars" style="margin-top:16px">${STATUSES.map(st=>`<div class="brow"><span class="bn"><span class="st st-${st}"><i></i>${st}</span></span>${stackBar([[ST_COL[st],stc[st]||0,st]],n)}<span class="bv num">${stc[st]||0}<small>${fmtPct(pct(stc[st]||0,n))}</small></span></div>`).join('')}</div>
+    </div>
+    <div class="card"><div class="card-h"><div><h2>Confirmations by cycle</h2><p>When in the month the confirmed leads came in</p></div></div>
+      ${(()=>{const g=groupStats(leads,'cycle').sort((a,b)=>a.k.localeCompare(b.k));const mx=Math.max(1,...g.map(x=>x.n));return g.length?`<div class="bars">${g.map(x=>`<div class="brow"><span class="bn">${esc(x.label)}</span>${stackBar([['var(--good)',x.c,'Confirmed'],['var(--line)',x.n-x.c,'Not confirmed']],mx)}<span class="bv num">${x.c}/${x.n}<small>${fmtPct(x.rate*100)}</small></span></div>`).join('')}</div><div class="legend" style="margin-top:12px"><span><i class="dot" style="background:var(--good)"></i>Confirmed</span><span><i class="dot" style="background:var(--line)"></i>Other leads</span></div>`:'<p class="note">No leads to show.</p>'})()}
+    </div>
+  </section>`;
+}
+
+/* ---------- marketing ---------- */
+const ALL_TR='All treatments', ALL_LANG='All languages', MIXED='Mixed';
+function fmtMoney(v,compact){
+  v=+v||0; const cur=S.settings.currency||'₹';
+  if(cur==='₹'){
+    if(compact&&v>=1e7)return '₹'+(v/1e7).toFixed(2)+' Cr';
+    if(compact&&v>=1e5)return '₹'+(v/1e5).toFixed(2)+' L';
+    return '₹'+Math.round(v).toLocaleString('en-IN');
+  }
+  if(compact&&v>=1e6)return cur+' '+(v/1e6).toFixed(2)+'M';
+  return cur+' '+Math.round(v).toLocaleString('en-US');
+}
+function dayNum(d){return Math.round(Date.parse(String(d).slice(0,10)+'T00:00:00Z')/86400000)}
+function monthEndStr(m){return `${m}-${pad(daysIn(m))}`}
+function overlapDays(a1,a2,b1,b2){const a=Math.max(dayNum(a1),dayNum(b1)),b=Math.min(dayNum(a2),dayNum(b2));return b<a?0:b-a+1}
+function isRunning(c){return !c.end||c.end>=todayStr()}
+/* Older campaigns stored one spend figure for a date range: turn that into monthly figures. */
+function normCamp(c){
+  if(!c.monthly||typeof c.monthly!=='object'){
+    c.monthly={};
+    if(c.start){const s=c.start,e=c.end||c.start,tot=overlapDays(s,e,s,e)||1;
+      for(const m of monthsBetween(s,e)){const k=overlapDays(s,e,m+'-01',monthEndStr(m))/tot;c.monthly[m]={spend:Math.round((+c.spend||0)*k),leads:c.repLeads==null||c.repLeads===''?null:Math.round((+c.repLeads||0)*k)}}}
+  }
+  if(!Array.isArray(c.creatives))c.creatives=c.creative?[c.creative]:[];
+  return c;
+}
+/* Days the campaign was live in month m (start date to stop date, or today while running). */
+function activeSpan(c,m){const s=c.start>m+'-01'?c.start:m+'-01';const cap=c.end||todayStr();const me=monthEndStr(m);const e=cap<me?cap:me;return e<s?null:[s,e]}
+function campInRange(c,from,to){
+  let spend=0,leads=0,hasLeads=false;
+  for(const [m,v] of Object.entries(c.monthly||{})){
+    const sp=activeSpan(c,m)||[m+'-01',monthEndStr(m)]; const tot=overlapDays(sp[0],sp[1],sp[0],sp[1]); const k=tot?overlapDays(sp[0],sp[1],from,to)/tot:0; if(!k)continue;
+    spend+=(+v.spend||0)*k; if(v.leads!=null&&v.leads!==''){leads+=(+v.leads||0)*k;hasLeads=true}
+  }
+  return {spend,leads,hasLeads};
+}
+function campaignsInRange(){const r=curRange();return S.campaigns.filter(c=>c.start&&c.start<=r.to&&campEnd(c)>=r.from)}
+function matchCampaign(raw,src){const s=normTxt(raw);if(!s)return null;const pool=src?S.campaigns.filter(c=>c.src===src):S.campaigns;return pool.find(c=>normTxt(c.name)===s)||(src?null:S.campaigns.find(c=>normTxt(c.name).includes(s)||s.includes(normTxt(c.name))))||null}
+/* Leads and spend come from the monthly figures you enter. Confirmations come from the leads in this app:
+   a lead tagged with a campaign counts for it; an untagged lead is matched to campaigns on the same platform
+   that were live that day (narrowed by treatment, language and channel) and shared by that month's spend. */
+function campStats(){
+  const r=curRange(), camps=campaignsInRange(), st={};
+  for(const c of camps){const x=campInRange(c,r.from,r.to);st[c.id]={c,spend:x.spend,rep:x.leads,hasRep:x.hasLeads,app:0,conf:0,tagged:0}}
+  let unmatched=0;
+  for(const l of leadsOfMonth()){
+    if(l.camp&&st[l.camp]){const x=st[l.camp];x.app++;x.tagged++;if(l.st==='Confirmed')x.conf++;continue}
+    const act=camps.filter(c=>c.src===l.src&&l.d>=c.start&&l.d<=campEnd(c));
+    if(!act.length){if(groupOf(l.src)==='Paid ads')unmatched++;continue}
+    const strict=act.filter(c=>(!c.tr||c.tr===ALL_TR||c.tr===l.tr)&&(!c.lang||c.lang===ALL_LANG||c.lang===l.lang)&&(!c.ch||c.ch===MIXED||c.ch===l.ch));
+    const cands=strict.length?strict:act; const wt=c=>Math.max(1,+((c.monthly||{})[monthOf(l.d)]||{}).spend||0); const tot=cands.reduce((a,c)=>a+wt(c),0);
+    for(const c of cands){const w=wt(c)/tot;st[c.id].app+=w;if(l.st==='Confirmed')st[c.id].conf+=w}
+  }
+  const rows=Object.values(st); for(const x of rows){x.leads=x.hasRep?x.rep:x.app;x.fromApp=!x.hasRep}
+  return {rows,unmatched};
+}
+const MK_DIMS={src:{t:'Platform',v:c=>c.src},ch:{t:'Channel',v:c=>c.ch||MIXED},tr:{t:'Treatment',v:c=>c.tr||ALL_TR},lang:{t:'Language',v:c=>c.lang||ALL_LANG},region:{t:'Market',v:c=>c.region||'—'},creative:{t:'Creative',v:c=>c.creatives&&c.creatives.length?c.creatives:['—']}};
+function mkGroup(rows,dim){
+  const m={};
+  for(const r of rows){let ks=MK_DIMS[dim].v(r.c);if(!Array.isArray(ks))ks=[ks];const w=1/ks.length;
+    for(const k of ks){const g=m[k]||(m[k]={k,n:0,spend:0,leads:0,conf:0});g.n++;g.spend+=r.spend*w;g.leads+=r.leads*w;g.conf+=r.conf*w}}
+  return Object.values(m).map(g=>Object.assign(g,{cpl:g.leads>=.5?g.spend/g.leads:null,cpc:g.conf>=.5?g.spend/g.conf:null,rate:g.leads?g.conf/g.leads:0}));
+}
+function mkBest(groups){const minL=+S.settings.minLeads||1;return groups.filter(g=>g.cpl!=null&&g.leads>=minL&&g.spend>0).sort((a,b)=>a.cpl-b.cpl)[0]}
+function statusChip(c){const t=todayStr();if(!c.end)return '<span class="chip good">Running</span>';if(c.end>=t)return `<span class="chip warn">Stops ${fmtDate(c.end)}</span>`;return `<span class="chip mute">Off since ${fmtDate(c.end)}</span>`}
+function figMonth(){const r=curRange();const t=todayStr();return S.period.mode==='month'?S.month:monthOf(r.to<t?r.to:t)}
+function vMarketing(){
+  const {rows,unmatched}=campStats(), minL=+S.settings.minLeads||1, multi=isMulti(), rng=curRange();
+  const spend=rows.reduce((a,r)=>a+r.spend,0), leads=rows.reduce((a,r)=>a+r.leads,0), conf=rows.reduce((a,r)=>a+r.conf,0);
+  const fm=figMonth(); const missing=S.campaigns.filter(c=>activeSpan(c,fm)&&!((c.monthly||{})[fm]&&(c.monthly[fm].spend||c.monthly[fm].spend===0)&&c.monthly[fm].spend!==''));
+  const by=S.mkBy, {k:sk,dir}=S.mkSort;
+  const val=(g,k)=>k==='k'?g.k:(g[k]==null?(dir>0?Infinity:-Infinity):g[k]);
+  const groups=mkGroup(rows,by).sort((a,b)=>{const x=val(a,sk),y=val(b,sk);return (typeof x==='string'?x.localeCompare(y):(x-y))*dir});
+  const best=mkBest(groups); const maxSpend=Math.max(1,...groups.map(g=>g.spend));
+  const th=(k,t,r='',act='mkSort',sort=S.mkSort)=>`<th class="sortable ${r}" data-act="${act}" data-k="${k}">${t}${sort.k===k?(sort.dir>0?' ↑':' ↓'):''}</th>`;
+  const hl=(k,dim)=>{const g=mkBest(mkGroup(rows,dim));return `<div class="hl"><div><span class="k">${k}</span>${g?`<span class="who">${esc(g.k)}</span><span class="why">${fmtMoney(g.cpl)} per lead · ${Math.round(g.leads)} leads${g.cpc!=null?' · '+fmtMoney(g.cpc)+' per confirmation':''}</span>`:'<span class="why">Not enough leads yet</span>'}</div></div>`};
+  const bestCamp=rows.filter(r=>r.leads>=minL&&r.spend>0).sort((a,b)=>a.spend/a.leads-b.spend/b.leads)[0];
+  const tl=(multi?monthsBetween(rng.from,rng.to).map(m=>[m,MONTHS[+m.slice(5)-1]+' '+m.slice(2,4),m+'-01',monthEndStr(m)]):[1,2,3].map(c=>[c,cycleRange(S.month,c),`${S.month}-${pad(c===1?1:c===2?11:21)}`,`${S.month}-${pad(c===1?10:c===2?20:daysIn(S.month))}`])).map(([k,label,f,t])=>{
+    const a=f>rng.from?f:rng.from,b=t<rng.to?t:rng.to; let sp=0,ld=0;
+    for(const c of campaignsInRange()){const x=campInRange(c,a,b);sp+=x.spend;ld+=x.leads}
+    const ls=leadsOfMonth().filter(l=>l.d>=a&&l.d<=b&&groupOf(l.src)==='Paid ads');
+    return {label,sp,ld,c:ls.filter(l=>l.st==='Confirmed').length}});
+  const tlMax=Math.max(1,...tl.map(x=>x.sp));
+  const q=normTxt(S.campQ);
+  const cv=(r,k)=>k==='name'?r.c.name:k==='start'?r.c.start:k==='cpl'?(r.leads>=.5?r.spend/r.leads:(S.campSort.dir>0?Infinity:-Infinity)):k==='cpc'?(r.conf>=.5?r.spend/r.conf:(S.campSort.dir>0?Infinity:-Infinity)):r[k];
+  const camps=rows.filter(r=>(!S.campSrc||r.c.src===S.campSrc)&&(!q||normTxt([r.c.name,r.c.tr,r.c.lang,r.c.region,(r.c.creatives||[]).join(' ')].join(' ')).includes(q)))
+    .sort((a,b)=>{const x=cv(a,S.campSort.k),y=cv(b,S.campSort.k);return (typeof x==='string'?x.localeCompare(y):(x-y))*S.campSort.dir});
+  const srcs=[...new Set(rows.map(r=>r.c.src))].sort();
+  const n1=x=>x<10&&x%1?x.toFixed(1):Math.round(x);
+  const running=S.campaigns.filter(isRunning).length;
+  return `${header('Marketing',`Campaigns, ad spend, leads and cost per lead. Each month, enter what every campaign spent and how many leads it brought; confirmations come from the leads in this app.`,`<button class="btn" data-act="campImport">${IC.up}Import</button><button class="btn sm" data-act="exportMk">${IC.down}CSV</button><button class="btn gold" data-act="bulkMonth">Update monthly figures</button><button class="btn primary" data-act="addCamp">${IC.plus}Add campaign</button>`)}
+  ${missing.length?`<div class="banner sample"><span class="sp"><b>${missing.length} campaign${missing.length>1?'s':''}</b> ran in ${monthLabel(fm)} but ${missing.length>1?'have':'has'} no spend entered yet.</span><button class="btn sm gold" data-act="bulkMonth" data-m="${fm}">Enter ${MONTHS_L[+fm.slice(5)-1]} figures</button></div>`:''}
+  <section class="grid g-tiles">
+    <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>Ad spend</span><span class="val num">${fmtMoney(spend,true)}</span><span class="sub">${rows.length} campaigns in this period · ${running} running now</span></div>
+    <div class="tile"><span class="lbl"><i></i>Leads</span><span class="val num">${cu(Math.round(leads))}</span><span class="sub">From your monthly figures</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--c-en)"></i>Cost per lead</span><span class="val num">${leads>=.5?fmtMoney(spend/leads):'–'}</span><span class="sub">Spend ÷ leads</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--good)"></i>Confirmed</span><span class="val num">${cu(Math.round(conf))}</span><span class="sub">From leads in the app</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--good)"></i>Cost per confirmation</span><span class="val num">${conf>=.5?fmtMoney(spend/conf):'–'}</span><span class="sub">Spend ÷ confirmed patients</span></div>
+  </section>
+  ${unmatched?`<p class="note">${unmatched} lead${unmatched>1?'s':''} from paid platforms in this period didn't match any live campaign on that platform, so ${unmatched>1?'they are':'it is'} not counted in campaign confirmations.</p>`:''}
+  ${rows.length?`<section class="grid g-4">${hl('Lowest cost per lead','src')}${hl('Best treatment','tr')}${hl('Best market','region')}<div class="hl"><div><span class="k">Best campaign</span>${bestCamp?`<span class="who">${esc(bestCamp.c.name)}</span><span class="why">${fmtMoney(bestCamp.spend/bestCamp.leads)} per lead · ${esc(bestCamp.c.src)}</span>`:'<span class="why">Not enough leads yet</span>'}</div></div></section>
+  <section class="card">
+    <div class="card-h"><div><h2>Spend and leads by ${MK_DIMS[by].t.toLowerCase()}</h2><p>Lowest cost per lead (with at least ${minL} leads) is marked best${by==='creative'?'. A campaign with several creatives is split evenly between them.':''}</p></div>
+      <div class="seg" role="group" aria-label="Group by">${Object.keys(MK_DIMS).map(d=>`<button data-act="mkBy" data-v="${d}" aria-pressed="${by===d}">${MK_DIMS[d].t}</button>`).join('')}</div></div>
+    <div class="tbl-wrap"><table><thead><tr>${th('k',MK_DIMS[by].t)}${th('n','Campaigns','r')}${th('spend','Spend')}${th('leads','Leads','r')}${th('cpl','Cost / lead','r')}${th('conf','Confirmed','r')}${th('cpc','Cost / confirmation','r')}</tr></thead><tbody>
+    ${groups.map(g=>`<tr><td><b>${by==='src'||by==='ch'?`<span class="lg"><i style="background:${by==='ch'?chColor(g.k):'var(--teal)'}"></i>${esc(g.k)}</span>`:by==='lang'&&g.k!==ALL_LANG?`<span class="lg"><i style="background:${langColor(g.k)}"></i>${esc(g.k)}</span>`:esc(g.k)}</b>${best&&best.k===g.k?' <span class="chip star">Best</span>':''}</td>
+      <td class="r num">${g.n}</td>
+      <td><div class="ratebar"><div class="track"><div class="stack" style="width:${g.spend/maxSpend*100}%"><i style="width:100%;background:var(--gold)"></i></div></div><b class="num" style="min-width:86px">${fmtMoney(g.spend,true)}</b></div></td>
+      <td class="r num"><b>${Math.round(g.leads)}</b></td><td class="r num"><b>${g.cpl!=null?fmtMoney(g.cpl):'–'}</b></td><td class="r num">${n1(g.conf)}</td>
+      <td class="r num">${g.cpc!=null?fmtMoney(g.cpc):'<span class="note">–</span>'}</td></tr>`).join('')}
+    </tbody></table></div>
+  </section>
+  <section class="card"><div class="card-h"><div><h2>Spend over ${multi?'months':'the month'}</h2><p>Spend, leads and cost per lead in each ${multi?'month':'10-day cycle'}</p></div><div class="legend"><span><i class="dot" style="background:var(--gold)"></i>Spend</span></div></div>
+    <div class="bars">${tl.map(x=>`<div class="brow" style="grid-template-columns:minmax(90px,130px) minmax(0,1fr) 250px"><span class="bn">${esc(x.label)}</span>${stackBar([['var(--gold)',x.sp,'Spend']],tlMax)}<span class="bv num">${fmtMoney(x.sp,true)}<small>${Math.round(x.ld)} leads${x.ld>=.5?' · '+fmtMoney(x.sp/x.ld)+'/lead':''} · ${x.c} conf.</small></span></div>`).join('')}</div>
+  </section>`:''}
+  <section class="card">
+    <div class="card-h"><div><h2>Campaigns</h2><p>A campaign keeps running from its start date until you turn it off. Use "Update month" to enter what it spent and the leads it brought.</p></div></div>
+    <div class="toolbar" style="margin-bottom:14px"><input type="search" id="campQ" class="grow" placeholder="Search campaign, treatment, market, creative…" value="${esc(S.campQ)}" aria-label="Search campaigns"><select id="campSrc" aria-label="Platform"><option value="">All platforms</option>${srcs.map(x=>`<option ${S.campSrc===x?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
+    ${camps.length?`<div class="tbl-wrap"><table><thead><tr>${th('name','Campaign','','campSort',S.campSort)}<th>Status</th><th>Treatment</th><th>Language</th><th>Market</th>${th('spend','Spend','r','campSort',S.campSort)}${th('leads','Leads','r','campSort',S.campSort)}${th('cpl','Cost / lead','r','campSort',S.campSort)}${th('conf','Conf.','r','campSort',S.campSort)}${th('cpc','Cost / conf.','r','campSort',S.campSort)}<th></th></tr></thead><tbody>
+    ${camps.map(r=>`<tr><td style="white-space:normal;min-width:280px"><span class="campname">${esc(r.c.name)}</span><span class="note">${esc(r.c.src)} · ${esc(r.c.ch||MIXED)} · since ${fmtDateY(r.c.start)}</span>${(r.c.creatives||[]).length?`<div class="langs" style="margin-top:6px;display:flex">${r.c.creatives.map(x=>`<span class="lg">${esc(x)}</span>`).join('')}</div>`:''}</td>
+      <td>${statusChip(r.c)}</td><td>${esc(r.c.tr||ALL_TR)}</td><td>${r.c.lang&&r.c.lang!==ALL_LANG?`<span class="lg"><i style="background:${langColor(r.c.lang)}"></i>${esc(r.c.lang)}</span>`:'<span class="note">All</span>'}</td><td>${esc(r.c.region||'—')}</td>
+      <td class="r num"><b>${fmtMoney(r.spend)}</b></td><td class="r num"><b>${Math.round(r.leads)}</b>${r.fromApp&&r.leads?'<br><span class="note">from app</span>':''}</td><td class="r num"><b>${r.leads>=.5?fmtMoney(r.spend/r.leads):'–'}</b></td><td class="r num">${n1(r.conf)}</td><td class="r num">${r.conf>=.5?fmtMoney(r.spend/r.conf):'–'}</td>
+      <td style="white-space:nowrap"><button class="btn sm" data-act="monthCamp" data-id="${esc(r.c.id)}">Update month</button> <button class="btn sm" data-act="editCamp" data-id="${esc(r.c.id)}">Edit</button></td></tr>`).join('')}
+    </tbody></table></div>`:`<div class="empty"><img src="emblem.png" alt=""><h2>No campaigns in ${esc(periodLabel())}</h2><p>Add each campaign with its platform, treatment, language, market and creatives, then enter its spend and leads each month.</p><button class="btn primary" data-act="addCamp">${IC.plus}Add campaign</button></div>`}
+  </section>`;
+}
+/* ----- campaign form ----- */
+function monthRows(c){const t=todayStr();const until=c.end&&c.end<t?c.end:t;const ms=c.start?monthsBetween(c.start,until<c.start?c.start:until).slice(-12).reverse():[];
+  return ms.length?`<div class="tbl-wrap"><table><thead><tr><th>Month</th><th>Amount spent (${esc(S.settings.currency||'₹')})</th><th>Leads</th><th class="r">Cost / lead</th></tr></thead><tbody>${ms.map(m=>{const v=(c.monthly||{})[m]||{};return `<tr><td><b>${monthLabel(m)}</b></td><td><input type="number" min="0" step="1" data-ms="${m}" value="${esc(v.spend??'')}" style="width:150px"></td><td><input type="number" min="0" step="1" data-ml="${m}" value="${esc(v.leads??'')}" style="width:110px"></td><td class="r num" data-mc="${m}">–</td></tr>`}).join('')}</tbody></table></div>`:'<p class="note">Pick a start date to enter monthly figures.</p>'}
+function readMonthInputs(scope){const out={};scope.querySelectorAll('[data-ms]').forEach(i=>{const m=i.dataset.ms;const l=scope.querySelector(`[data-ml="${m}"]`);const sp=i.value,ld=l?l.value:'';if(sp!==''||ld!=='')out[m]={spend:sp===''?null:Math.max(0,+sp||0),leads:ld===''?null:Math.max(0,+ld||0)}});return out}
+function liveCPL(scope){scope.querySelectorAll('[data-ms]').forEach(i=>{const m=i.dataset.ms;const l=scope.querySelector(`[data-ml="${m}"]`);const c=scope.querySelector(`[data-mc="${m}"]`);if(!c)return;const sp=+i.value||0,ld=+(l&&l.value)||0;c.textContent=sp&&ld?fmtMoney(sp/ld):'–'})}
+let CF=null;
+function creativePicks(sel){return S.settings.creatives.map(x=>`<button type="button" data-act="toggleCre" data-v="${esc(x)}" aria-pressed="${sel.includes(x)}">${esc(x)}</button>`).join('')}
+function campForm(id){
+  const ex=id?S.campaigns.find(c=>c.id===id):null;
+  const c=ex?JSON.parse(JSON.stringify(ex)):{name:'',src:(S.settings.platforms.find(p=>p.g==='Paid ads')||S.settings.platforms[0]).n,ch:MIXED,tr:ALL_TR,lang:ALL_LANG,region:S.settings.regions[0],creatives:[],start:monthOf(todayStr())+'-01',end:null,monthly:{},notes:''};
+  CF=c;
+  const opt=(arr,cur)=>arr.map(x=>`<option ${x===cur?'selected':''}>${esc(x)}</option>`).join('');
+  openModal(`<div class="modal-h"><div><h2>${ex?'Edit campaign':'Add a campaign'}</h2><p>A campaign runs from its start date until you turn it off. Enter its spend and leads for each month below.</p></div>${closeBtn}</div>
+  <form class="form" id="cform">
+    <label class="f full">Campaign name<input type="text" id="cName" value="${esc(c.name)}" placeholder="e.g. Pediatric Rehab · GCC · Arabic video"></label>
+    <label class="f">Platform<select id="cSrc">${opt(S.settings.platforms.map(p=>p.n),c.src)}</select></label>
+    <label class="f">Channel (where leads land)<select id="cCh">${opt([MIXED,...S.settings.channels],c.ch||MIXED)}</select></label>
+    <label class="f">Treatment<select id="cTr">${opt([ALL_TR,...TREATMENTS],c.tr||ALL_TR)}</select><span class="hint">"All treatments" for a common or brand video</span></label>
+    <label class="f">Language<select id="cLang">${opt([ALL_LANG,...S.settings.languages],c.lang||ALL_LANG)}</select></label>
+    <label class="f">Market<select id="cReg">${opt(S.settings.regions,c.region)}</select></label>
+    <label class="f">Start date<input type="date" id="cStart" value="${esc(c.start||'')}"></label>
+    <div class="f full" style="display:grid;gap:8px;font-size:13px;font-weight:800;color:var(--ink-2)">Creatives used <span class="hint" style="font-weight:500;color:var(--muted)">Pick all that apply</span>
+      <div class="pick" id="cCre">${creativePicks(c.creatives)}</div>
+      <div class="toolbar"><input type="text" id="cNewCre" placeholder="Add a creative, e.g. Saudi patient testimonial" style="flex:1;min-width:200px"><button type="button" class="btn sm" data-act="addCre">${IC.plus}Add creative</button></div></div>
+    <div class="f full" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;font-size:13px;font-weight:800;color:var(--ink-2)">
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cRun" ${!c.end?'checked':''}> Campaign is running</label>
+      <label id="cOffWrap" style="display:${c.end?'flex':'none'};gap:8px;align-items:center">Turned off on <input type="date" id="cOff" value="${esc(c.end||todayStr())}"></label></div>
+    <label class="f full">Notes<input type="text" id="cNotes" value="${esc(c.notes||'')}" placeholder="Audience, offer, video used…"></label>
+    <div class="f full" id="cMonths">${monthRows(c)}</div>
+  </form>
+  <div id="delZone"></div>
+  <div class="modal-f">${ex?`<button class="btn danger" data-act="askDelCamp" data-id="${esc(ex.id)}" style="margin-right:auto">${IC.trash}Delete</button>`:''}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveCamp" data-id="${esc(id||'')}">${ex?'Save changes':'Add campaign'}</button></div>`);
+  const md=$('#modal');
+  const rebuild=()=>{CF.monthly=Object.assign({},CF.monthly,readMonthInputs(md));CF.start=$('#cStart').value;CF.end=$('#cRun').checked?null:($('#cOff').value||todayStr());$('#cMonths').innerHTML=monthRows(CF);liveCPL(md)};
+  $('#cStart').addEventListener('change',rebuild); $('#cOff').addEventListener('change',rebuild);
+  $('#cRun').addEventListener('change',()=>{$('#cOffWrap').style.display=$('#cRun').checked?'none':'flex';rebuild()});
+  md.addEventListener('input',e=>{if(e.target.dataset.ms||e.target.dataset.ml)liveCPL(md)}); liveCPL(md);
+}
+async function addCreative(){
+  const v=$('#cNewCre').value.trim(); if(!v)return;
+  const ex=S.settings.creatives.find(x=>x.toLowerCase()===v.toLowerCase());
+  if(!ex){S.settings.creatives.push(v); if(Store.mode==='db')await save('config','main',S.settings)}
+  const name=ex||v; const sel=[...document.querySelectorAll('#cCre button[aria-pressed="true"]')].map(b=>b.dataset.v); if(!sel.includes(name))sel.push(name);
+  $('#cCre').innerHTML=creativePicks(sel); $('#cNewCre').value=''; toast(ex?'Creative selected':'Creative added');
+}
+async function saveCamp(id){
+  const md=$('#modal');
+  const c=Object.assign({},CF,{name:$('#cName').value.trim(),src:$('#cSrc').value,ch:$('#cCh').value,tr:$('#cTr').value,lang:$('#cLang').value,region:$('#cReg').value,start:$('#cStart').value,end:$('#cRun').checked?null:($('#cOff').value||todayStr()),notes:$('#cNotes').value.trim(),
+    creatives:[...document.querySelectorAll('#cCre button[aria-pressed="true"]')].map(b=>b.dataset.v)});
+  c.monthly=Object.assign({},CF.monthly||{},readMonthInputs(md));
+  for(const m of Object.keys(c.monthly)){const v=c.monthly[m];if(v.spend==null&&v.leads==null)delete c.monthly[m]}
+  if(!c.name){toast('Give the campaign a name');return}
+  if(!c.start){toast('Pick a start date');return}
+  if(c.end&&c.end<c.start){toast('The stop date is before the start date');return}
+  for(const k of ['spend','repLeads','imp','clicks','creative'])delete c[k];
+  c.at=new Date().toISOString(); const cid=id||'c_'+uid(); delete c.id;
+  if(Store.mode==='db'&&!await save('campaigns',cid,c))return;
+  c.id=cid; S.campaigns=S.campaigns.filter(x=>x.id!==cid).concat([c]);
+  closeModal(); toast(id?'Campaign saved':'Campaign added'); render();
+}
+/* ----- monthly figures ----- */
+function monthCamp(id,m){
+  const c=S.campaigns.find(x=>x.id===id); if(!c)return;
+  const t=todayStr(); const until=c.end&&c.end<t?c.end:t; const ms=monthsBetween(c.start,until<c.start?c.start:until).reverse();
+  m=m&&ms.includes(m)?m:(ms.includes(figMonth())?figMonth():ms[0]);
+  const v=(c.monthly||{})[m]||{};
+  openModal(`<div class="modal-h"><div><h2>${esc(c.name)}</h2><p>${esc(c.src)} · ${statusChip(c)} · enter what the ad platform shows for the month.</p></div>${closeBtn}</div>
+  <div class="form">
+    <label class="f">Month<select id="mSel">${ms.map(x=>`<option value="${x}" ${x===m?'selected':''}>${monthLabel(x)}</option>`).join('')}</select></label>
+    <label class="f">Amount spent (${esc(S.settings.currency||'₹')})<input type="number" min="0" step="1" data-ms="${m}" value="${esc(v.spend??'')}"></label>
+    <label class="f">Leads<input type="number" min="0" step="1" data-ml="${m}" value="${esc(v.leads??'')}"></label>
+    <div class="f">Cost per lead<b class="bigscore num" style="font-size:28px" data-mc="${m}">–</b></div>
+  </div>
+  <div class="modal-f">${isRunning(c)?`<button class="btn danger" data-act="campOff" data-id="${esc(c.id)}" style="margin-right:auto">Turn off campaign</button>`:`<button class="btn" data-act="campOn" data-id="${esc(c.id)}" style="margin-right:auto">Turn back on</button>`}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveMonthOne" data-id="${esc(c.id)}">Save ${MONTHS_L[+m.slice(5)-1]}</button></div>`);
+  const md=$('#modal'); liveCPL(md);
+  md.addEventListener('input',()=>liveCPL(md));
+  $('#mSel').addEventListener('change',e=>monthCamp(id,e.target.value));
+}
+async function putCamp(c){const d=Object.assign({},c);delete d.id;d.at=new Date().toISOString();if(Store.mode==='db')return await save('campaigns',c.id,d);return true}
+async function saveMonthOne(id){
+  const c=S.campaigns.find(x=>x.id===id); if(!c)return;
+  const vals=readMonthInputs($('#modal')); const m=$('#mSel').value;
+  const n=Object.assign({},c,{monthly:Object.assign({},c.monthly)}); if(vals[m])n.monthly[m]=vals[m]; else delete n.monthly[m];
+  if(!await putCamp(n))return; Object.assign(c,n); closeModal(); toast(`${monthLabel(m)} saved`); render();
+}
+async function campOnOff(id,on){
+  const c=S.campaigns.find(x=>x.id===id); if(!c)return;
+  const n=Object.assign({},c,{end:on?null:todayStr()}); if(!await putCamp(n))return; Object.assign(c,n); closeModal(); toast(on?'Campaign is running again':'Campaign turned off from today'); render();
+}
+function bulkMonth(m){
+  m=m||figMonth();
+  const list=S.campaigns.filter(c=>activeSpan(c,m)).sort((a,b)=>a.src.localeCompare(b.src)||a.name.localeCompare(b.name));
+  const opts=[];for(let i=0;i<12;i++)opts.push(shiftMonth(monthOf(todayStr()),-i));if(!opts.includes(m))opts.push(m);
+  openModal(`<div class="modal-h"><div><h2>Monthly figures</h2><p>Enter spend and leads for every campaign that ran in the month, straight from each ad platform.</p></div>${closeBtn}</div>
+  <div class="toolbar"><label class="f" style="min-width:200px">Month<select id="bSel">${opts.map(x=>`<option value="${x}" ${x===m?'selected':''}>${monthLabel(x)}</option>`).join('')}</select></label></div>
+  ${list.length?`<div class="tbl-wrap"><table><thead><tr><th>Campaign</th><th>Amount spent (${esc(S.settings.currency||'₹')})</th><th>Leads</th><th class="r">Cost / lead</th></tr></thead><tbody>${list.map(c=>{const v=(c.monthly||{})[m]||{};return `<tr data-cid="${esc(c.id)}"><td style="white-space:normal"><b>${esc(c.name)}</b><br><span class="note">${esc(c.src)} · ${statusChip(c)}</span></td><td><input type="number" min="0" step="1" data-ms="${m}" value="${esc(v.spend??'')}" style="width:140px"></td><td><input type="number" min="0" step="1" data-ml="${m}" value="${esc(v.leads??'')}" style="width:100px"></td><td class="r num" data-mc="${m}">–</td></tr>`}).join('')}</tbody></table></div>`:`<p class="note">No campaigns were running in ${monthLabel(m)}.</p>`}
+  <div class="modal-f"><button class="btn" data-act="close">Cancel</button>${list.length?`<button class="btn primary" data-act="saveBulk" data-m="${m}">Save ${monthLabel(m)}</button>`:''}</div>`);
+  const md=$('#modal');
+  md.querySelectorAll('tr[data-cid]').forEach(tr=>liveCPL(tr));
+  md.addEventListener('input',e=>{const tr=e.target.closest('tr[data-cid]');if(tr)liveCPL(tr)});
+  $('#bSel').addEventListener('change',e=>bulkMonth(e.target.value));
+}
+async function saveBulk(m){
+  const btn=document.querySelector('[data-act="saveBulk"]'); btn.disabled=true; btn.textContent='Saving…';
+  let n=0;
+  for(const tr of document.querySelectorAll('#modal tr[data-cid]')){
+    const c=S.campaigns.find(x=>x.id===tr.dataset.cid); if(!c)continue;
+    const v=readMonthInputs(tr)[m]; const old=(c.monthly||{})[m];
+    if(JSON.stringify(v||null)===JSON.stringify(old||null))continue;
+    const nc=Object.assign({},c,{monthly:Object.assign({},c.monthly)}); if(v)nc.monthly[m]=v; else delete nc.monthly[m];
+    if(!await putCamp(nc))break; Object.assign(c,nc); n++;
+  }
+  closeModal(); toast(n?`Saved ${monthLabel(m)} for ${n} campaign${n>1?'s':''}`:'Nothing changed'); render();
+}
+/* ----- import a monthly report ----- */
+let CIMP=null;
+const CFIELDS=[['name','Campaign name',/campaign|^name|ad name/],['src','Platform',/platform|source|network|publisher/],['spend','Amount spent',/spend|spent|amount|cost/],['rep','Leads',/lead|result|conversion/],['start','Start date',/start|begin|^date|day/],['tr','Treatment',/treat|service|department/],['lang','Language',/lang/],['region','Market',/market|region|country|geo|location/],['ch','Channel',/channel|objective/],['creative','Creative',/creative|format/]];
+function campImportModal(){
+  CIMP={rows:null,map:{}};
+  const opts=[];for(let i=0;i<12;i++)opts.push(shiftMonth(monthOf(todayStr()),-i));
+  openModal(`<div class="modal-h"><div><h2>Import a monthly report</h2><p>Export the month's campaign report from Meta, Snapchat, Google or TikTok Ads (or your own sheet) and paste it with the header row. Campaigns already in the app get that month's spend and leads; new names become new running campaigns.</p></div>${closeBtn}</div>
+  <div class="toolbar"><label class="f" style="min-width:200px">Report month<select id="cimpMonth">${opts.map(x=>`<option value="${x}" ${x===figMonth()?'selected':''}>${monthLabel(x)}</option>`).join('')}</select></label><input type="file" id="cimpFile" accept=".csv,.tsv,.txt,text/csv"></div>
+  <textarea id="cimpText" placeholder="Campaign name&#9;Platform&#9;Amount spent&#9;Leads"></textarea>
+  <div class="toolbar"><button class="btn primary" data-act="cimpRead">Read data</button></div><div id="cimpMap"></div>`);
+  $('#cimpFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('#cimpText').value=r.result;cimpRead()};r.readAsText(f)});
+}
+function cimpRead(){
+  const rows=parseCSV($('#cimpText').value||'');
+  if(rows.length<2){$('#cimpMap').innerHTML='<p class="note">Paste at least a header row and one campaign.</p>';return}
+  CIMP.rows=rows; const head=rows[0].map(h=>h.trim()); const used=new Set(); CIMP.map={};
+  for(const [k,,re] of CFIELDS){const i=head.findIndex((h,ix)=>!used.has(ix)&&re.test(h.toLowerCase()));if(i>=0){CIMP.map[k]=i;used.add(i)}}
+  const sel=k=>`<select data-cmap="${k}"><option value="">— not in my report —</option>${head.map((h,i)=>`<option value="${i}" ${CIMP.map[k]===i?'selected':''}>${esc(h||'Column '+(i+1))}</option>`).join('')}</select>`;
+  $('#cimpMap').innerHTML=`<h3>Match your columns</h3><div class="form" style="margin-top:10px">${CFIELDS.map(([k,t])=>`<label class="f">${t}${sel(k)}</label>`).join('')}
+    <label class="f">If the platform column is missing<select id="cimpSrc">${S.settings.platforms.map(p=>`<option>${esc(p.n)}</option>`).join('')}</select></label>
+    <label class="f">Dates are written<select id="cimpDay"><option value="1">Day first (11/03 = 11 March)</option><option value="0">Month first</option></select></label></div>
+    <div id="cimpPrev" style="margin-top:12px"></div><div class="modal-f" style="margin-top:12px"><button class="btn" data-act="close">Cancel</button><button class="btn primary" id="cimpGo" data-act="cimpGo">Import</button></div>`;
+  $('#cimpMap').querySelectorAll('select').forEach(x=>x.addEventListener('change',cimpPreview)); $('#cimpMonth').addEventListener('change',cimpPreview); cimpPreview();
+}
+function cimpBuild(){
+  document.querySelectorAll('[data-cmap]').forEach(x=>{CIMP.map[x.dataset.cmap]=x.value===''?undefined:+x.value});
+  const M=CIMP.map, df=$('#cimpDay').value==='1', m=$('#cimpMonth').value, out=[];
+  const num=v=>{const n=parseFloat(String(v||'').replace(/[^0-9.\-]/g,''));return isFinite(n)?n:null};
+  const pick=(v,list,all)=>{const s=normTxt(v);if(!s)return all;return list.find(x=>normTxt(x)===s)||list.find(x=>s.includes(normTxt(x))||normTxt(x).includes(s))||all};
+  const agg={};
+  for(const row of CIMP.rows.slice(1)){
+    const g=k=>M[k]===undefined?'':(row[M[k]]||'').trim();
+    const name=g('name'); if(!name)continue;
+    const src=g('src')?normPlatform(g('src'),S.settings.platforms):$('#cimpSrc').value;
+    const key=src+'|'+normTxt(name);
+    const a=agg[key]||(agg[key]={name,src,spend:0,leads:null,start:null,tr:pick(g('tr'),TREATMENTS,ALL_TR),lang:normLang(g('lang'),S.settings.languages)||ALL_LANG,region:pick(g('region'),S.settings.regions,S.settings.regions[0]),ch:pick(g('ch'),S.settings.channels,MIXED),creatives:g('creative')?[pick(g('creative'),S.settings.creatives,g('creative'))]:[]});
+    a.spend+=num(g('spend'))||0; const l=num(g('rep')); if(l!=null)a.leads=(a.leads||0)+l;
+    const sd=parseDate(g('start'),df); if(sd&&(!a.start||sd<a.start))a.start=sd;
+  }
+  for(const a of Object.values(agg)){const ex=matchCampaign(a.name,a.src);out.push(Object.assign(a,{month:m,ex:ex?ex.id:null}))}
+  return out;
+}
+function cimpPreview(){
+  const out=cimpBuild(); CIMP.out=out; const sp=out.reduce((a,c)=>a+c.spend,0), ld=out.reduce((a,c)=>a+(c.leads||0),0);
+  $('#cimpPrev').innerHTML=`<div class="kv"><div><span>Update existing</span><b class="num">${out.filter(c=>c.ex).length}</b></div><div><span>New campaigns</span><b class="num">${out.filter(c=>!c.ex).length}</b></div><div><span>Total spend</span><b class="num">${fmtMoney(sp,true)}</b></div><div><span>Leads</span><b class="num">${Math.round(ld)}</b></div></div>
+  ${out.length?`<div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Campaign</th><th>Platform</th><th></th><th class="r">Spend</th><th class="r">Leads</th><th class="r">Cost / lead</th></tr></thead><tbody>${out.slice(0,8).map(c=>`<tr><td>${esc(c.name)}</td><td>${esc(c.src)}</td><td>${c.ex?'<span class="chip teal">Update</span>':'<span class="chip good">New</span>'}</td><td class="r num">${fmtMoney(c.spend)}</td><td class="r num">${c.leads??'–'}</td><td class="r num">${c.leads?fmtMoney(c.spend/c.leads):'–'}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+  const b=$('#cimpGo'); if(b){b.disabled=!out.length;b.textContent=`Import ${out.length} campaigns for ${monthLabel($('#cimpMonth').value)}`}
+}
+async function cimpGo(){
+  const out=CIMP.out||[]; if(!out.length)return; const b=$('#cimpGo'); b.disabled=true; b.textContent='Importing…';
+  let n=0;
+  for(const a of out){
+    const fig={spend:a.spend,leads:a.leads};
+    if(a.ex){const c=S.campaigns.find(x=>x.id===a.ex);const nc=Object.assign({},c,{monthly:Object.assign({},c.monthly,{[a.month]:fig})});if(nc.start>a.month+'-01'&&!a.start)nc.start=a.month+'-01';if(!await putCamp(nc))break;Object.assign(c,nc)}
+    else{const c={id:'c_'+uid(),name:a.name,src:a.src,ch:a.ch,tr:a.tr,lang:a.lang,region:a.region,creatives:a.creatives,start:a.start&&monthOf(a.start)<=a.month?a.start:a.month+'-01',end:null,monthly:{[a.month]:fig},notes:''};if(!await putCamp(c))break;S.campaigns.push(c)}
+    n++;
+  }
+  closeModal(); toast(`Imported ${n} campaigns`); render();
+}
+/* Example campaigns, used for the offline preview and to seed the sample data. */
+function makeCampaigns(){
+  const T=[
+    ['Pediatric Rehab Package · GCC · Arabic video','Meta Ads','WhatsApp','Pediatric rehab','Arabic','GCC (all)',['Video','Testimonial video'],160000],
+    ['Autism & Speech Delay · Saudi · Lead form','Meta Ads','Lead form','Pediatric rehab','Arabic','Saudi Arabia',['Testimonial video'],85000],
+    ['Spine & Back Pain · Kerala · Malayalam','Meta Ads','WhatsApp','Spine care','Malayalam','Kerala',['Doctor video','Image'],48000],
+    ['Pain Management · India','Meta Ads','Mixed','Pain management','All languages','India',['Image','Carousel'],30000],
+    ['Physio Package · North India · Hindi','Meta Ads','WhatsApp','Physiotherapy','Hindi','India',['Video'],20000],
+    ['Doctor Introduction Video · GCC','Snapchat Ads','Mixed','All treatments','Arabic','GCC (all)',['Doctor video'],80000],
+    ['Pediatric Rehab · Saudi · Snap form','Snapchat Ads','Lead form','Pediatric rehab','Arabic','Saudi Arabia',['Video'],40000],
+    ['Search · Rehabilitation hospital Kerala','Google Ads','Mixed','All treatments','All languages','India',['Search ad'],70000],
+    ['Search · Neuro rehab India for GCC','Google Ads','Mixed','Neuro rehab','Arabic','GCC (all)',['Search ad'],35000],
+    ['Patient Journey Video · GCC','TikTok Ads','Mixed','All treatments','All languages','GCC (all)',['Video','Testimonial video'],42000],
+    ['Corporate Physio · UAE','LinkedIn Ads','Lead form','Physiotherapy','English','UAE',['Image'],16000],
+    ['Neuro Rehab Awareness · Saudi','X Ads','Mixed','Neuro rehab','Arabic','Saudi Arabia',['Image'],11000]];
+  const t=todayStr(), cur=monthOf(t), months=[shiftMonth(cur,-2),shiftMonth(cur,-1),cur];
+  return T.map((x,i)=>{
+    let seed=hashN(x[0],99991)+3; const rnd=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296};
+    const end=i===11?`${months[1]}-${pad(daysIn(months[1]))}`:null; const monthly={};
+    for(const m of months){if(end&&m>monthOf(end))continue;const frac=m===cur?(+t.slice(8))/daysIn(m):1;const spend=Math.round(x[7]*(0.8+rnd()*0.4)*frac/100)*100;monthly[m]={spend,leads:Math.round(spend/(1300+rnd()*1700))}}
+    return {id:'c_s'+(i+1),name:x[0],src:x[1],ch:x[2],tr:x[3],lang:x[4],region:x[5],creatives:x[6],start:months[0]+'-01',end,monthly,notes:'',sample:true};
+  });
+}
+
+/* ---------- leads ---------- */
+function filteredLeads(){
+  const f=S.leadF, q=normTxt(f.q);
+  return leadsOfMonth().filter(l=>(!f.staff||l.s===f.staff)&&(!f.src||l.src===f.src)&&(!f.ch||l.ch===f.ch)&&(!f.lang||l.lang===f.lang)&&(!f.st||l.st===f.st)
+    &&(!q||normTxt([l.nm,l.ph,(staffById(l.s)||{}).name,l.tr,l.src].join(' ')).includes(q))).sort((a,b)=>String(b.d).localeCompare(String(a.d)));
+}
+function vLeads(){
+  const all=leadsOfMonth(), rows=filteredLeads(), f=S.leadF, per=50, pages=Math.max(1,Math.ceil(rows.length/per)); if(f.page>=pages)f.page=pages-1;
+  const pg=rows.slice(f.page*per,(f.page+1)*per);
+  const opt=(arr,cur,lab)=>`<option value="">${lab}</option>`+arr.map(([v,t])=>`<option value="${esc(v)}" ${cur===v?'selected':''}>${esc(t)}</option>`).join('');
+  const stc={}; for(const l of all)stc[l.st]=(stc[l.st]||0)+1;
+  return `${header('Leads',`${all.length} leads in ${esc(periodLabel())}. Change a status here and the dashboard updates straight away.`,`<button class="btn" data-act="import">${IC.up}Import</button><button class="btn primary" data-act="addLead">${IC.plus}Add lead</button>`)}
+  <section class="seg" role="group" aria-label="Status" style="justify-self:start">${['',...STATUSES].map(s=>`<button data-act="stFilter" data-v="${s}" aria-pressed="${f.st===s}">${s||'All'} <span class="num muted">${s?stc[s]||0:all.length}</span></button>`).join('')}</section>
+  <section class="card">
+    <div class="toolbar" style="margin-bottom:14px">
+      <input type="search" id="lq" placeholder="Search name, staff, treatment…" value="${esc(f.q)}" aria-label="Search leads" class="grow">
+      <select id="lstaff" aria-label="Staff">${opt(S.staff.map(p=>[p.id,p.name]),f.staff,'All staff')}</select>
+      <select id="lsrc" aria-label="Platform">${opt(S.settings.platforms.map(s=>[s.n,s.n]),f.src,'All platforms')}</select>
+      <select id="lch" aria-label="Channel">${opt(S.settings.channels.map(s=>[s,s]),f.ch,'All channels')}</select>
+      <select id="llang" aria-label="Language">${opt(S.settings.languages.map(s=>[s,s]),f.lang,'All languages')}</select>
+    </div>
+    ${pg.length?`<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Lead</th><th>Language</th><th>Platform</th><th>Channel</th><th>Treatment</th><th>Handled by</th><th>Status</th><th></th></tr></thead><tbody>
+    ${pg.map(l=>{const p=staffById(l.s);return `<tr><td class="num">${fmtDate(l.d)}</td><td><b>${esc(l.nm||'—')}</b>${l.ph?`<br><span class="note num">${esc(l.ph)}</span>`:''}</td><td><span class="lg"><i style="background:${langColor(l.lang)}"></i>${esc(l.lang)}</span></td><td>${esc(l.src)}${l.camp?`<br><span class="note">${esc((S.campaigns.find(c=>c.id===l.camp)||{}).name||'')}</span>`:''}</td><td><span class="lg"><i style="background:${chColor(l.ch)}"></i>${esc(l.ch)}</span></td><td>${esc(l.tr||'')}</td><td>${p?`<div class="who-cell">${avatar(p)}<span>${esc(p.name)}</span></div>`:'<span class="chip bad">Unknown</span>'}</td>
+      <td><select class="stsel st-${l.st}" data-act="leadStatus" data-c="${esc(l._c)}" data-r="${esc(l.r)}" aria-label="Status">${STATUSES.map(s=>`<option ${s===l.st?'selected':''}>${s}</option>`).join('')}</select></td>
+      <td><button class="iconbtn" data-act="delLead" data-c="${esc(l._c)}" data-r="${esc(l.r)}" aria-label="Delete lead" title="Delete">${IC.trash}</button></td></tr>`}).join('')}
+    </tbody></table></div>
+    ${pages>1?`<div class="toolbar" style="margin-top:12px;justify-content:flex-end"><span class="note">Page ${f.page+1} of ${pages}</span><button class="btn sm" data-act="lpage" data-d="-1" ${f.page?'':'disabled'}>Previous</button><button class="btn sm" data-act="lpage" data-d="1" ${f.page<pages-1?'':'disabled'}>Next</button></div>`:''}`
+    :`<div class="empty"><img src="emblem.png" alt=""><h2>No leads ${all.length?'match these filters':'yet for '+esc(periodLabel())}</h2><p>Paste rows from your lead Google Sheet, upload a CSV, or add leads one by one.</p></div>`}
+  </section>`;
+}
+
+/* ---------- audits ---------- */
+function vAudits(){
+  const active=S.staff.filter(p=>p.active!==false);
+  const picked=new Set([...S.cycles.c1,...S.cycles.c2,...S.cycles.c3]);
+  const remaining=active.filter(p=>!picked.has(p.id));
+  const auditBy={}; for(const a of S.audits)auditBy[a.staffId]=a;
+  const cur=currentCycle(S.month), done=S.audits.length;
+  const cards=[1,2,3].map(c=>{
+    const ids=(S.cycles['c'+c]||[]).filter(id=>staffById(id)); const reviewed=ids.filter(id=>auditBy[id]).length;
+    const prevPicked=c===1||(S.cycles['c'+(c-1)]||[]).length>0;
+    const n=pickCount(remaining.length,c);
+    return `<div class="card cycle ${cur===c?'now':''}">
+      <div class="meta"><div><h2>Cycle ${c}</h2><span class="when">${cycleRange(S.month,c)}</span></div>
+        ${ids.length?`<div class="ring" style="--p:${pct(reviewed,ids.length)}"><b class="num">${reviewed}/${ids.length}</b></div>`:(cur>c?'<span class="chip bad">Missed</span>':'<span class="chip mute">Not picked</span>')}</div>
+      ${ids.length?`<div class="plist">${ids.map(id=>{const p=staffById(id);const a=auditBy[id];return `<div class="prow"><span class="pn">${avatar(p)}<span>${esc(p.name)}</span></span><span class="pa">${a?`<span class="chip ${a.pct>=70?'good':a.pct>=50?'warn':'bad'}">${Math.round(a.pct)}</span><button class="btn sm" data-act="audit" data-id="${id}" data-c="${c}">Edit</button>`:`<button class="btn sm" data-act="swap" data-id="${id}" data-c="${c}" title="Swap for someone not yet picked (on leave etc.)">Swap</button><button class="btn sm primary" data-act="audit" data-id="${id}" data-c="${c}">Review</button>`}</span></div>`}).join('')}</div>
+        ${reviewed===0?`<button class="btn sm" data-act="repick" data-c="${c}" style="justify-self:start">${IC.shuffle}Clear and pick again</button>`:''}`
+      :`<p class="note">${remaining.length?`${n} of the ${remaining.length} people not yet reviewed this month will be picked at random.`:'Everyone has been picked this month.'}</p>
+        <button class="btn ${cur===c?'primary':''}" data-act="pick" data-c="${c}" style="justify-self:start" ${remaining.length&&prevPicked?'':'disabled'}>${IC.shuffle}Pick ${n} at random</button>
+        ${!prevPicked?'<span class="note">Pick cycle '+(c-1)+' first.</span>':''}`}
+    </div>`}).join('');
+  const recent=S.audits.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,10);
+  return `${header('WhatsApp audits',`<b>${monthLabel(S.month)}.</b> Every 10 days a random third of the active team is picked, so each person is reviewed once a month. ${esc((S.settings.reviewers||[]).join(', '))} reviews their chats and scores six points.`,'','month')}
+  <section class="grid g-tiles">
+    <div class="tile"><span class="lbl"><i></i>Active team</span><span class="val num">${active.length}</span><span class="sub">${pickCount(active.length,1)} per cycle</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--good)"></i>Reviewed</span><span class="val num">${done}</span><span class="sub">${fmtPct(pct(done,active.length))} of the team</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>Waiting for review</span><span class="val num">${pendingAudits()}</span><span class="sub">Picked, not scored yet</span></div>
+    <div class="tile"><span class="lbl"><i style="background:var(--line)"></i>Not picked yet</span><span class="val num">${remaining.length}</span><span class="sub">Left for later cycles</span></div>
+  </section>
+  <section class="grid g-3">${cards}</section>
+  ${recent.length?`<section class="card"><div class="card-h"><div><h2>Latest reviews</h2><p>Click a name to see their full breakdown</p></div></div><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Person</th><th>Cycle</th><th>Reviewer</th><th class="r">Chats</th><th class="r">Score</th><th>Coaching note</th></tr></thead><tbody>
+    ${recent.map(a=>{const p=staffById(a.staffId);return `<tr><td class="num">${fmtDate(a.date)}</td><td>${p?`<div class="who-cell">${avatar(p)}<button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button></div>`:'—'}</td><td>${a.cycle}</td><td>${esc(a.evaluator||'')}</td><td class="r num">${a.chats||''}</td><td class="r"><span class="chip ${a.pct>=70?'good':a.pct>=50?'warn':'bad'}">${Math.round(a.pct)}</span></td><td style="white-space:normal;min-width:240px" class="note">${esc(a.notes||'')}</td></tr>`}).join('')}
+  </tbody></table></div></section>`:''}
+  <section class="card"><div class="card-h"><div><h2>What gets checked</h2><p>Each point is rated 1 to 5. Six points add up to a score out of 100.</p></div></div>
+    <div class="grid g-3">${CRITERIA.map((c,i)=>`<div class="prow" style="display:block;padding:12px 14px"><b><span class="muted num">${i+1}.</span> ${c.t}</b><div class="note">${c.d}</div></div>`).join('')}</div></section>`;
+}
+
+/* ---------- team ---------- */
+function vTeam(){
+  const f=S.teamF,q=normTxt(f.q);
+  const branches=[...new Set(S.staff.map(p=>p.branch))].sort();
+  const rows=S.staff.filter(p=>(!q||normTxt(p.name+' '+p.code).includes(q))&&(!f.lang||langsOf(p).includes(f.lang))&&(!f.branch||p.branch===f.branch)&&(f.status==='all'||(f.status==='active'?p.active!==false:p.active===false)));
+  const act=S.staff.filter(p=>p.active!==false);
+  const multi=act.filter(p=>langsOf(p).length>1).length;
+  return `${header('Sales team',`${act.length} active people. "Name in lead sheet" must match your lead sheet's dropdown so imported leads land on the right person.`,`<button class="btn" data-act="pasteTeam">Paste a list</button><button class="btn primary" data-act="addPerson">${IC.plus}Add person</button>`,'none')}
+  <section class="grid g-tiles">
+    ${S.settings.languages.map(l=>`<div class="tile"><span class="lbl"><i style="background:${langColor(l)}"></i>${esc(l)}</span><span class="val num">${act.filter(p=>langsOf(p).includes(l)).length}</span><span class="sub">people handle ${esc(l)} leads</span></div>`).join('')}
+    <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>Multi-language</span><span class="val num">${multi}</span><span class="sub">handle 2 or more languages</span></div>
+  </section>
+  <section class="card">
+    <div class="toolbar" style="margin-bottom:14px">
+      <input type="search" id="tq" class="grow" placeholder="Search name…" value="${esc(f.q)}" aria-label="Search team">
+      <select id="tlang" aria-label="Language"><option value="">All languages</option>${S.settings.languages.map(t=>`<option ${f.lang===t?'selected':''}>${esc(t)}</option>`).join('')}</select>
+      <select id="tbranch" aria-label="Branch"><option value="">All branches</option>${branches.map(b=>`<option ${f.branch===b?'selected':''}>${esc(b)}</option>`).join('')}</select>
+      <select id="tstatus" aria-label="Status">${[['active','Active'],['inactive','Inactive'],['all','Everyone']].map(([v,t])=>`<option value="${v}" ${f.status===v?'selected':''}>${t}</option>`).join('')}</select>
+    </div>
+    ${rows.length?`<div class="tbl-wrap"><table><thead><tr><th>Person</th><th>Languages</th><th>Branch</th><th>Name in lead sheet</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>
+    ${rows.map(p=>`<tr><td><div class="who-cell">${avatar(p)}<div><button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button><small>${esc(p.role)}${p.notes?' · '+esc(p.notes):''}</small></div></div></td><td>${langChips(p)}</td><td>${esc(p.branch)}</td><td class="note">${esc(p.code||'')}</td><td class="num">${esc(p.phone||'')}</td><td>${p.active!==false?'<span class="chip good">Active</span>':'<span class="chip mute">Inactive</span>'}</td>
+      <td><button class="btn sm" data-act="editPerson" data-id="${p.id}">Edit</button></td></tr>`).join('')}
+    </tbody></table></div>`:`<div class="empty"><img src="emblem.png" alt=""><h2>No one here</h2><p>Add people one by one, or paste the names from your lead sheet's dropdown.</p></div>`}
+  </section>`;
+}
+
+/* ---------- settings ---------- */
+function vSetup(){
+  const s=S.settings,w=s.weights;
+  const wrow=(k,t,d)=>`<label class="f">${t}<input type="number" min="0" max="100" step="5" data-w="${k}" value="${+w[k]||0}"><span class="hint">${d}</span></label>`;
+  return `${header('Settings','Reviewers, lead platforms, languages, markets and how the score is worked out.','','none')}
+  <section class="card"><div class="card-h"><div><h2>WhatsApp reviewers</h2><p>People who can review chats. The first name is used by default in the review form.</p></div></div>
+    <label class="f">Reviewers (comma separated)<input type="text" id="sRev" value="${esc(s.reviewers.join(', '))}"></label></section>
+  <section class="card"><div class="card-h"><div><h2>Lead platforms</h2><p>Where leads come from. The group decides the summary on the dashboard (Paid ads, Website, Referral, Management…).</p></div><button class="btn sm" data-act="addPlat">${IC.plus}Add platform</button></div>
+    <div class="grid" style="gap:8px" id="platList">${s.platforms.map((p,i)=>platRow(p,i)).join('')}</div></section>
+  <section class="grid g-2">
+    <div class="card"><h2>Channels</h2><p class="note" style="margin:4px 0 12px">How the lead reached the team (WhatsApp, lead form…)</p><label class="f">Channels (comma separated)<input type="text" id="sCh" value="${esc(s.channels.join(', '))}"></label></div>
+    <div class="card"><h2>Languages</h2><p class="note" style="margin:4px 0 12px">Languages leads speak and staff can handle</p><label class="f">Languages (comma separated)<input type="text" id="sLang" value="${esc(s.languages.join(', '))}"></label></div>
+    <div class="card"><h2>Markets</h2><p class="note" style="margin:4px 0 12px">Where campaigns are targeted (GCC, Saudi Arabia, India…)</p><label class="f">Markets (comma separated)<input type="text" id="sReg" value="${esc(s.regions.join(', '))}"></label></div>
+    <div class="card"><h2>Ad spend</h2><p class="note" style="margin:4px 0 12px">Currency for campaign spend, and creative types</p><div class="form"><label class="f">Currency<select id="sCur">${['₹','SAR','AED','USD','QAR','KWD','OMR'].map(c=>`<option ${s.currency===c?'selected':''}>${c}</option>`).join('')}</select></label><label class="f">Creative types<input type="text" id="sCre" value="${esc(s.creatives.join(', '))}"></label></div></div>
+  </section>
+  <section class="card"><div class="card-h"><div><h2>Score</h2><p>Weights are relative and don't need to add up to 100.</p></div></div>
+    <div class="form">
+      ${wrow('audit','WhatsApp review','Their review score this month')}
+      ${wrow('confirmations','Confirmations','Patients confirmed, compared with the top person or the target')}
+      ${wrow('closing','Confirmation rate','Confirmed ÷ leads, compared with the best closer')}
+      ${wrow('volume','Lead volume','Leads handled, compared with the busiest person')}
+      <label class="f">Minimum leads for a fair rate<input type="number" min="1" id="sMin" value="${+s.minLeads||5}"><span class="hint">Below this, the confirmation rate counts for less</span></label>
+      <label class="f">Monthly confirmation target<input type="number" min="0" id="sTarget" value="${+s.target||0}"><span class="hint">0 = compare with the top performer</span></label>
+      <label class="f full">Words in your sheet's status column that mean "confirmed"<input type="text" id="sConf" value="${esc(s.confirmWords)}"></label>
+    </div>
+    <div class="toolbar" style="margin-top:16px"><span class="note grow">Grades: <span class="chip star">Star</span> 85+ · <span class="chip good">Strong</span> 70–84 · <span class="chip warn">Average</span> 55–69 · <span class="chip bad">Needs coaching</span> below 55</span></div>
+  </section>
+  <div class="toolbar" style="justify-content:flex-end"><button class="btn" data-act="resetSettings">Restore defaults</button><button class="btn primary" data-act="saveSettings">Save settings</button></div>
+  <section class="grid g-2">
+    <div class="card"><h2>Sample data</h2><p class="note" style="margin:4px 0 12px">Remove all example leads, campaigns and reviews, in every month. Your team list stays.</p><button class="btn danger" data-act="askClearSample">${IC.trash}Remove sample data</button><div id="sampleZone" style="margin-top:10px"></div></div>
+    <div class="card"><h2>Backup</h2><p class="note" style="margin:4px 0 12px">Download the team, settings, campaigns, every lead and ${monthLabel(S.month)}'s reviews.</p><button class="btn" data-act="backup">${IC.down}Download backup</button></div>
+  </section>`;
+}
+function platRow(p,i){return `<div class="plat-row"><input type="text" data-pn="${i}" value="${esc(p.n)}" aria-label="Platform name"><select data-pg="${i}" aria-label="Group">${GROUPS.map(g=>`<option ${p.g===g?'selected':''}>${g}</option>`).join('')}</select><button class="iconbtn" data-act="delPlat" data-i="${i}" aria-label="Remove platform">${IC.x}</button></div>`}
+function readPlatforms(){const out=[];document.querySelectorAll('[data-pn]').forEach(inp=>{const n=inp.value.trim();if(n)out.push({n,g:document.querySelector(`[data-pg="${inp.dataset.pn}"]`).value})});return out}
+
+/* ================= modals ================= */
+function openModal(html){$('#modal').innerHTML=html;$('#overlay').classList.add('open');const f=$('#modal').querySelector('input,select,textarea');(f||$('#modal').querySelector('button')).focus()}
+function closeModal(){$('#overlay').classList.remove('open');$('#modal').innerHTML=''}
+let toastT; function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+const closeBtn='<button class="iconbtn" data-act="close" aria-label="Close">'+IC.x+'</button>';
+
+function personModal(id){
+  const p=staffById(id); if(!p)return;
+  const b=computeBoard(S.staff,leadsOfMonth(),auditsInRange(),S.settings).find(x=>x.p.id===id);
+  const a=auditsInRange().filter(x=>x.staffId===id);
+  const LBL={audit:'WhatsApp review',confirmations:'Confirmations',closing:'Confirmation rate',volume:'Lead volume'};
+  openModal(`<div class="modal-h"><div class="who-cell">${avatar(p,true)}<div><h2>${esc(p.name)}</h2><p>${esc(p.role)} · ${esc(p.branch)} · ${langChips(p)}</p></div></div>${closeBtn}</div>
+   ${b?`<div class="kv"><div><span>Score</span><b class="num">${b.score!=null?Math.round(b.score):'–'}</b></div><div><span>Rank</span><b class="num">${b.rank||'–'}</b></div><div><span>Leads</span><b class="num">${b.n}</b></div><div><span>Confirmed</span><b class="num">${b.c}</b></div><div><span>Conf. rate</span><b class="num">${b.n?fmtPct(b.rate*100,1):'–'}</b></div><div><span>WhatsApp</span><b class="num">${b.audit!=null?Math.round(b.audit):'–'}</b></div></div>
+   <div class="grid g-2"><div><h3 style="margin-bottom:10px">Score breakdown</h3>${bars(Object.entries(b.parts).map(([k,v])=>[LBL[k],Math.round(v)]),0)}</div>
+   <div><h3 style="margin-bottom:10px">Leads by platform</h3>${bars(Object.entries(b.src).sort((x,y)=>y[1]-x[1]),b.n)}</div></div>
+   <p class="note">${Object.entries(b.lang).map(([k,v])=>esc(k)+' '+v).join(' · ')}${b.n?' — ':''}${Object.entries(b.st).map(([k,v])=>k+' '+v).join(' · ')}</p>`:'<p class="note">No data this month.</p>'}
+   ${a.map(x=>`<div><h3>WhatsApp review · ${x.month?MONTHS[+x.month.slice(5)-1]+' ':''}cycle ${x.cycle}${x.evaluator?' · '+esc(x.evaluator):''}${x.date?' · '+fmtDate(x.date):''}</h3><div class="plist" style="margin-top:8px">${CRITERIA.map(c=>`<div class="prow"><span>${c.t}</span><b class="num">${(x.scores||{})[c.k]||'–'}/5</b></div>`).join('')}</div>${x.notes?`<p class="note" style="margin-top:8px">${esc(x.notes)}</p>`:''}</div>`).join('')}
+   <div class="modal-f"><button class="btn" data-act="editPerson" data-id="${p.id}">Edit details</button><button class="btn primary" data-act="close">Done</button></div>`);
+}
+
+function personForm(id){
+  const p=id?staffById(id):{name:'',code:'',role:'Sales',branch:'',langs:[S.settings.languages[0]],phone:'',notes:'',active:true};
+  const branches=[...new Set(S.staff.map(x=>x.branch).filter(b=>b&&b!=='—'))].sort();
+  const pl=langsOf(p);
+  openModal(`<div class="modal-h"><div><h2>${id?'Edit '+esc(p.name):'Add a person'}</h2><p>Pick every language this person can handle.</p></div>${closeBtn}</div>
+  <form id="pform" class="form">
+    <label class="f">Name<input type="text" id="pName" required value="${esc(p.name)}"></label>
+    <label class="f">Name in lead sheet<input type="text" id="pCode" value="${esc(p.code||'')}" placeholder="e.g. DR JABIR MEDICITY(AR)"></label>
+    <div class="f full" style="display:grid;gap:8px;font-size:13px;font-weight:800;color:var(--ink-2)">Languages handled<div class="pick" id="pLangs">${S.settings.languages.map(l=>`<button type="button" data-act="toggleLang" data-v="${esc(l)}" aria-pressed="${pl.includes(l)}"><i style="background:${langColor(l)}"></i>${esc(l)}</button>`).join('')}</div></div>
+    <label class="f">Role<select id="pRole">${ROLES.map(r=>`<option ${p.role===r?'selected':''}>${r}</option>`).join('')}</select></label>
+    <label class="f">Branch<input type="text" id="pBranch" list="branchList" value="${esc(p.branch==='—'?'':p.branch)}"><datalist id="branchList">${branches.map(b=>`<option value="${esc(b)}">`).join('')}</datalist></label>
+    <label class="f">WhatsApp number<input type="tel" id="pPhone" value="${esc(p.phone||'')}"></label>
+    <label class="f" style="align-self:end;display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" id="pActive" ${p.active!==false?'checked':''}> Active (in reviews and leaderboard)</label>
+  </form>
+  <div id="delZone"></div>
+  <div class="modal-f">${id?`<button class="btn danger" data-act="askDelete" data-id="${id}" style="margin-right:auto">${IC.trash}Delete</button>`:''}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="savePerson" data-id="${id||''}">${id?'Save changes':'Add person'}</button></div>`);
+}
+
+function pasteTeamModal(){
+  openModal(`<div class="modal-h"><div><h2>Paste a list of names</h2><p>One per line, exactly as in your lead sheet's dropdown, like <b>DR NASEEBA KOTTAKAL (AR)</b>. "(AR)" sets Arabic, otherwise Malayalam; add more languages afterwards with Edit.</p></div>${closeBtn}</div>
+  <textarea id="ptext" placeholder="ABDUL NAZER ZAHRA(AR)&#10;DR ANAGHA MEDICARE"></textarea>
+  <div id="ppreview"></div>
+  <div class="modal-f"><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="savePaste">Add these people</button></div>`);
+  $('#ptext').addEventListener('input',previewPaste);
+}
+function pastedPeople(){
+  const lines=($('#ptext').value||'').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  const out=[]; for(const l of lines){const p=parseLabel(l); if(!p)continue; const dup=S.staff.find(x=>normTxt(x.code)===normTxt(p.code)); out.push(Object.assign(p,{dup:!!dup}))} return out;
+}
+function previewPaste(){
+  const ps=pastedPeople();
+  $('#ppreview').innerHTML=ps.length?`<div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Branch</th><th>Language</th><th></th></tr></thead><tbody>${ps.map(p=>`<tr><td>${esc(p.name)}</td><td>${esc(p.role)}</td><td>${esc(p.branch)}</td><td>${langChips(p)}</td><td>${p.dup?'<span class="chip mute">Already in team</span>':''}</td></tr>`).join('')}</tbody></table></div>`:'';
+}
+
+function leadForm(){
+  const staff=S.staff.filter(p=>p.active!==false);
+  const def=monthOf(todayStr())===S.month?todayStr():`${S.month}-01`;
+  openModal(`<div class="modal-h"><div><h2>Add a lead</h2><p>The language is filled from the staff member; change it if the patient speaks something else.</p></div>${closeBtn}</div>
+  <form id="lform" class="form">
+    <label class="f">Lead name<input type="text" id="fNm" placeholder="Patient or parent name"></label>
+    <label class="f">Phone<input type="tel" id="fPh"></label>
+    <label class="f">Date<input type="date" id="fD" value="${def}"></label>
+    <label class="f">Handled by<select id="fS">${staff.map(p=>`<option value="${p.id}" data-lang="${esc(langsOf(p)[0])}">${esc(p.name)}</option>`).join('')}</select></label>
+    <label class="f">Platform<select id="fSrc">${S.settings.platforms.map(s=>`<option>${esc(s.n)}</option>`).join('')}</select></label>
+    <label class="f">Came in through<select id="fCh">${S.settings.channels.map(s=>`<option>${esc(s)}</option>`).join('')}</select></label>
+    <label class="f">Language<select id="fLang">${S.settings.languages.map(t=>`<option>${esc(t)}</option>`).join('')}</select></label>
+    <label class="f">Treatment<select id="fTr">${TREATMENTS.map(t=>`<option>${t}</option>`).join('')}</select></label>
+    <label class="f">Status<select id="fSt">${STATUSES.map(t=>`<option>${t}</option>`).join('')}</select></label>
+    <label class="f full">Campaign (optional)<select id="fCamp"><option value="">Not tagged, match automatically</option>${S.campaigns.slice().sort((a,b)=>String(b.start).localeCompare(String(a.start))).map(c=>`<option value="${esc(c.id)}">${esc(c.name)} · ${esc(c.src)} · ${fmtDate(c.start)}</option>`).join('')}</select></label>
+  </form>
+  <div class="modal-f"><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveLead">Save lead</button></div>`);
+  const sync=()=>{const o=$('#fS').selectedOptions[0];if(o)$('#fLang').value=o.dataset.lang};
+  $('#fS').addEventListener('change',sync); sync();
+}
+
+/* ---------- import ---------- */
+let IMP=null;
+const FIELDS=[['d','Date',/date|time|day/],['s','Assigned staff',/assign|staff|agent|owner|sales|handled|executive|counsel|gre/],['src','Platform / source',/source|platform|^ads?$|from/],['ch','Channel',/channel|medium|via|type/],['lang','Language',/lang/],['st','Status',/status|stage|result|outcome|confirm|conver|remark/],['nm','Lead name',/^name|patient|lead name|customer|client/],['ph','Phone',/phone|mobile|whats|number|contact/],['tr','Treatment',/treat|service|speciality|department|condition|interest/],['camp','Campaign',/campaign|ad ?set/]];
+function importModal(){
+  IMP={rows:null,map:{}};
+  openModal(`<div class="modal-h"><div><h2>Import leads</h2><p>In Google Sheets, select the rows including the header row, copy, and paste below. Or choose a CSV file. Each lead goes into the month of its date.</p></div>${closeBtn}</div>
+  <div class="toolbar"><input type="file" id="impFile" accept=".csv,.tsv,.txt,text/csv"></div>
+  <textarea id="impText" placeholder="Date&#9;Name&#9;Phone&#9;Platform&#9;Channel&#9;Language&#9;Assigned to&#9;Status"></textarea>
+  <div class="toolbar"><button class="btn primary" data-act="impRead">Read data</button></div>
+  <div id="impMap"></div>`);
+  $('#impFile').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{$('#impText').value=r.result;impRead()};r.readAsText(f)});
+}
+function impRead(){
+  const rows=parseCSV($('#impText').value||'');
+  if(rows.length<2){$('#impMap').innerHTML='<p class="note">Paste at least a header row and one data row.</p>';return}
+  IMP.rows=rows; const head=rows[0].map(h=>h.trim());
+  const used=new Set(); IMP.map={};
+  for(const [k,,re] of FIELDS){const i=head.findIndex((h,ix)=>!used.has(ix)&&re.test(h.toLowerCase()));if(i>=0){IMP.map[k]=i;used.add(i)}}
+  const sel=k=>`<select data-map="${k}"><option value="">— not in my sheet —</option>${head.map((h,i)=>`<option value="${i}" ${IMP.map[k]===i?'selected':''}>${esc(h||'Column '+(i+1))}</option>`).join('')}</select>`;
+  $('#impMap').innerHTML=`<h3>Match your columns</h3><div class="form" style="margin-top:10px">${FIELDS.map(([k,t])=>`<label class="f">${t}${sel(k)}</label>`).join('')}
+    <label class="f">Dates are written<select id="impDayFirst"><option value="1">Day first (11/03 = 11 March)</option><option value="0">Month first (03/11 = 11 March)</option></select></label></div>
+    <div id="impPrev" style="margin-top:14px"></div>
+    <div class="modal-f" style="margin-top:14px"><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="impGo" id="impGo">Import</button></div>`;
+  $('#impMap').querySelectorAll('select').forEach(s=>s.addEventListener('change',impPreview));
+  impPreview();
+}
+function impBuild(){
+  document.querySelectorAll('[data-map]').forEach(s=>{IMP.map[s.dataset.map]=s.value===''?undefined:+s.value});
+  const dayFirst=$('#impDayFirst').value==='1', M=IMP.map, words=S.settings.confirmWords.split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const out=[],unknown={},badDate=[];
+  for(const row of IMP.rows.slice(1)){
+    const g=k=>M[k]===undefined?'':(row[M[k]]||'').trim();
+    const p=matchStaff(g('s'),S.staff);
+    if(!p){const k=g('s')||'(blank)';unknown[k]=(unknown[k]||0)+1;continue}
+    const d=M.d===undefined?(monthOf(todayStr())===S.month?todayStr():`${S.month}-01`):parseDate(g('d'),dayFirst);
+    if(!d){badDate.push(g('d'));continue}
+    const srcRaw=g('src');
+    out.push({r:uid(),d,s:p.id,src:normPlatform(srcRaw,S.settings.platforms),ch:normChannel(g('ch')||srcRaw,S.settings.channels,S.settings.channels[0]),lang:normLang(g('lang'),S.settings.languages)||langsOf(p)[0],st:normStatus(g('st'),words),nm:g('nm'),ph:g('ph'),tr:g('tr')});
+    const cm=matchCampaign(g('camp'));if(cm)out[out.length-1].camp=cm.id;
+  }
+  return {out,unknown,badDate};
+}
+function impPreview(){
+  const {out,unknown,badDate}=impBuild(); IMP.out=out;
+  const months={};for(const l of out)months[monthOf(l.d)]=(months[monthOf(l.d)]||0)+1;
+  const unk=Object.entries(unknown);
+  $('#impPrev').innerHTML=`<div class="kv"><div><span>Ready</span><b class="num">${out.length}</b></div><div><span>Confirmed</span><b class="num">${out.filter(l=>l.st==='Confirmed').length}</b></div><div><span>Staff not found</span><b class="num">${unk.reduce((s,x)=>s+x[1],0)}</b></div><div><span>Bad dates</span><b class="num">${badDate.length}</b></div></div>
+  <p class="note" style="margin-top:8px">Months: ${Object.entries(months).map(([m,n])=>monthLabel(m)+' '+n).join(' · ')||'—'}</p>
+  ${unk.length?`<p class="note"><b>These names didn't match anyone and will be skipped:</b> ${unk.slice(0,12).map(([k,n])=>esc(k)+' ('+n+')').join(', ')}${unk.length>12?'…':''}. Add them under Sales team, or fix "Name in lead sheet", then import again.</p>`:''}
+  ${out.length?`<div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Date</th><th>Staff</th><th>Platform</th><th>Channel</th><th>Language</th><th>Status</th><th>Lead</th></tr></thead><tbody>${out.slice(0,5).map(l=>`<tr><td>${fmtDate(l.d)}</td><td>${esc(staffById(l.s).name)}</td><td>${esc(l.src)}</td><td>${esc(l.ch)}</td><td>${esc(l.lang)}</td><td>${l.st}</td><td>${esc(l.nm)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
+  const b=$('#impGo'); if(b){b.disabled=!out.length;b.textContent=`Import ${out.length} leads`}
+}
+async function impGo(){
+  const out=IMP.out||[]; if(!out.length)return;
+  const btn=$('#impGo'); btn.disabled=true; btn.textContent='Importing…';
+  const byMonth={}; for(const l of out)(byMonth[monthOf(l.d)]=byMonth[monthOf(l.d)]||[]).push(l);
+  let ok=true;
+  for(const [m,ls] of Object.entries(byMonth)){
+    for(let i=0;i<ls.length;i+=250){
+      const id=`${m}_${uid()}`, doc={month:m,kind:'import',rows:ls.slice(i,i+250),at:new Date().toISOString()};
+      if(Store.mode==='db'){ok=await save('leads',id,doc)&&ok}
+      if(Store.mode!=='db'||ok)S.chunks.push(Object.assign({id},doc));
+    }
+  }
+  closeModal(); toast(ok?`Imported ${out.length} leads`:'Some leads could not be saved');
+  render();
+}
+
+/* ---------- audit form ---------- */
+function auditForm(id,cycle){
+  const p=staffById(id); if(!p)return;
+  const ex=S.audits.find(a=>a.staffId===id)||{scores:{}};
+  const revs=S.settings.reviewers.length?S.settings.reviewers:['Gokul Sir'];
+  const last=ex.evaluator||lastEvaluator(); const cur=revs.includes(last)?last:revs[0];
+  openModal(`<div class="modal-h"><div class="who-cell">${avatar(p,true)}<div><h2>WhatsApp review · ${esc(p.name)}</h2><p>Cycle ${cycle} (${cycleRange(S.month,cycle)}) · ${langChips(p)} · open their WhatsApp and read recent lead chats.</p></div></div>${closeBtn}</div>
+  <div class="crit">${CRITERIA.map(c=>`<div class="critrow"><div><b>${c.t}</b><span>${c.d}</span></div><div class="rate" role="group" aria-label="${c.t}">${[1,2,3,4,5].map(v=>`<button type="button" data-act="rate" data-k="${c.k}" data-v="${v}" aria-pressed="${(ex.scores||{})[c.k]===v}">${v}</button>`).join('')}</div></div>`).join('')}</div>
+  <div class="form">
+    <label class="f">Reviewed by<select id="aEval">${revs.map(r=>`<option ${r===cur?'selected':''}>${esc(r)}</option>`).join('')}</select></label>
+    <label class="f">Chats checked<input type="number" min="0" id="aChats" value="${esc(ex.chats||'')}"></label>
+    <label class="f">Date<input type="date" id="aDate" value="${esc(ex.date||todayStr())}"></label>
+    <label class="f full">Coaching note<textarea id="aNotes" style="min-height:80px;font-family:var(--font-body);font-size:15px" placeholder="What to keep doing, what to fix">${esc(ex.notes||'')}</textarea></label>
+  </div>
+  <div class="modal-f"><span style="margin-right:auto;display:flex;align-items:baseline;gap:6px" class="note"><span class="bigscore num" id="aScore">–</span>/100 <span id="aLeft"></span></span><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveAudit" data-id="${id}" data-c="${cycle}">Save review</button></div>`);
+  updAuditScore();
+}
+function lastEvaluator(){try{return localStorage.getItem('milife-evaluator')||''}catch(e){return ''}}
+function readRates(){const sc={};document.querySelectorAll('.rate button[aria-pressed="true"]').forEach(b=>sc[b.dataset.k]=+b.dataset.v);return sc}
+function updAuditScore(){const sc=readRates();const n=Object.keys(sc).length;const t=Object.values(sc).reduce((a,b)=>a+b,0);$('#aScore').textContent=n===CRITERIA.length?Math.round(t/30*100):'–';$('#aLeft').textContent=n===CRITERIA.length?'':`${CRITERIA.length-n} still to rate`}
+
+/* ================= actions ================= */
+async function changeMonth(d){S.month=shiftMonth(S.month,d);S.leadF.page=0;try{await loadAudits()}catch(e){toast('Could not load that month')}render()}
+async function changePeriod(){S.leadF.page=0;try{await loadAudits()}catch(e){toast('Could not load that period')}render()}
+async function act(name,el){
+  const id=el.dataset.id, c=+el.dataset.c;
+  switch(name){
+    case 'retry': loadAll(); break;
+    case 'seedStaff': {
+      el.disabled=true;
+      try{const list=await (await fetch('seed-staff.json',{cache:'no-store'})).json(); let n=0;
+        for(const p of list){const id=p.id; const d=Object.assign({},p); delete d.id; if(!await save('staff',id,d))break; n++}
+        toast(n+' people added'); await loadAll();
+      }catch(e){console.error(e);toast('Could not load the team list');el.disabled=false}
+      break}
+    case 'pApply': {const f=$('#pFrom').value,t=$('#pTo').value;if(!f||!t){toast('Pick both dates');break}if(f>t){toast('The start date is after the end date');break}S.period={mode:'custom',from:f,to:t};changePeriod();break}
+    case 'mkBy': S.mkBy=el.dataset.v; S.mkSort={k:'spend',dir:-1}; render(); break;
+    case 'mkSort': {const k=el.dataset.k; S.mkSort=S.mkSort.k===k?{k,dir:-S.mkSort.dir}:{k,dir:k==='k'||k==='cpl'||k==='cpc'?1:-1}; render(); break}
+    case 'campSort': {const k=el.dataset.k; S.campSort=S.campSort.k===k?{k,dir:-S.campSort.dir}:{k,dir:k==='name'||k==='cpl'||k==='cpc'?1:-1}; render(); break}
+    case 'addCamp': campForm(null); break;
+    case 'editCamp': campForm(id); break;
+    case 'monthCamp': monthCamp(id); break;
+    case 'bulkMonth': bulkMonth(el.dataset.m); break;
+    case 'saveBulk': await saveBulk(el.dataset.m); break;
+    case 'saveMonthOne': await saveMonthOne(id); break;
+    case 'campOff': await campOnOff(id,false); break;
+    case 'campOn': await campOnOff(id,true); break;
+    case 'toggleCre': el.setAttribute('aria-pressed',String(el.getAttribute('aria-pressed')!=='true')); break;
+    case 'addCre': await addCreative(); break;
+    case 'saveCamp': await saveCamp(id); break;
+    case 'askDelCamp': $('#delZone').innerHTML=`<div class="banner offline"><span class="sp">Delete this campaign? Leads tagged with it become untagged.</span><button class="btn sm danger solid" data-act="doDelCamp" data-id="${id}">Delete campaign</button></div>`; break;
+    case 'doDelCamp': {if(Store.mode==='db'){try{await Store.del('campaigns',id)}catch(e){toast('Could not delete');break}} S.campaigns=S.campaigns.filter(c=>c.id!==id); closeModal(); toast('Campaign deleted'); render(); break}
+    case 'campImport': campImportModal(); break;
+    case 'cimpRead': cimpRead(); break;
+    case 'cimpGo': cimpGo(); break;
+    case 'exportMk': {
+      const {rows}=campStats(); const lines=[['Campaign','Platform','Channel','Treatment','Language','Market','Creatives','Start','Status','Spend in period','Leads','Cost per lead','Confirmed (app)','Cost per confirmation']].concat(rows.map(r=>[r.c.name,r.c.src,r.c.ch||MIXED,r.c.tr||ALL_TR,r.c.lang||ALL_LANG,r.c.region||'',(r.c.creatives||[]).join(' + '),r.c.start,r.c.end?'Off since '+r.c.end:'Running',Math.round(r.spend),Math.round(r.leads),r.leads>=.5?Math.round(r.spend/r.leads):'',r.conf.toFixed(1),r.conf>=.5?Math.round(r.spend/r.conf):'']));
+      await offerFile(`milife-marketing-${periodLabel().replace(/[^A-Za-z0-9]+/g,'-')}.csv`,lines.map(r=>r.map(v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(',')).join('\n')); break}
+    case 'cBy': S.cBy=el.dataset.v; S.cSort={k:'rate',dir:-1}; render(); break;
+    case 'cSort': {const k=el.dataset.k; S.cSort=S.cSort.k===k?{k,dir:-S.cSort.dir}:{k,dir:k==='label'?1:-1}; render(); break}
+    case 'cDrill': S.cf[el.dataset.d]=el.dataset.v; if(location.hash!=='#closing')location.hash='closing'; else render(); break;
+    case 'cCell': S.cf.lang=el.dataset.a; S.cf[S.hmCol]=el.dataset.b; render(); break;
+    case 'cRemove': S.cf[el.dataset.d]=''; render(); break;
+    case 'cClear': for(const k in S.cf)S.cf[k]=''; render(); break;
+    case 'hmCol': S.hmCol=el.dataset.v; render(); break;
+    case 'exportClosing': {
+      const rows=groupStats(applyCF(leadsOfMonth()),S.cBy).sort((a,b)=>b.n-a.n);
+      const fl=Object.entries(S.cf).filter(([,v])=>v).map(([d,v])=>DIMS[d].t+'='+DIMS[d].lab(v)).join('; ');
+      const lines=[[DIMS[S.cBy].t,'Leads','Confirmed','Confirmation rate %','Follow-up','Lost']].concat(rows.map(r=>[r.label,r.n,r.c,(r.rate*100).toFixed(1),r.fu,r.lost]));
+      await offerFile(`milife-closing-by-${S.cBy}-${S.month}.csv`,(fl?`"Filters: ${fl.replace(/"/g,'""')}"\n`:'')+lines.map(r=>r.map(v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(',')).join('\n')); break}
+    case 'close': closeModal(); break;
+    case 'mPrev': changeMonth(-1); break;
+    case 'mNext': changeMonth(1); break;
+    case 'person': personModal(id); break;
+    case 'boardLang': S.boardLang=el.dataset.v; render(); break;
+    case 'stFilter': S.leadF.st=el.dataset.v; S.leadF.page=0; render(); break;
+    case 'sort': {const k=el.dataset.k; S.boardSort=S.boardSort.k===k?{k,dir:-S.boardSort.dir}:{k,dir:k==='name'?1:-1}; render(); break}
+    case 'exportBoard': {
+      const board=boardRows(computeBoard(S.staff,leadsOfMonth(),auditsInRange(),S.settings));
+      const lines=[['Rank','Name','Languages','Branch','Leads','Confirmed','Confirmation rate %','WhatsApp review','Score','Grade']].concat(board.map(b=>[b.rank||'',b.p.name,langsOf(b.p).join(' + '),b.p.branch,b.n,b.c,b.n?(b.rate*100).toFixed(1):'',b.audit!=null?Math.round(b.audit):'',b.score!=null?Math.round(b.score):'',b.grade.t]));
+      await offerFile(`milife-leaderboard-${S.month}.csv`,lines.map(r=>r.map(v=>/[",\n]/.test(String(v))?`"${String(v).replace(/"/g,'""')}"`:v).join(',')).join('\n')); break}
+    case 'import': importModal(); break;
+    case 'impRead': impRead(); break;
+    case 'impGo': impGo(); break;
+    case 'addLead': if(!S.staff.length){toast('Add your sales team first');break} leadForm(); break;
+    case 'saveLead': {
+      const l={r:uid(),d:$('#fD').value,s:$('#fS').value,src:$('#fSrc').value,ch:$('#fCh').value,lang:$('#fLang').value,st:$('#fSt').value,nm:$('#fNm').value.trim(),ph:$('#fPh').value.trim(),tr:$('#fTr').value};
+      if($('#fCamp').value)l.camp=$('#fCamp').value;
+      if(!l.d||!l.s){toast('Pick a date and a staff member');break}
+      const m=monthOf(l.d);
+      let ch=null;
+      ch=S.chunks.find(x=>x.kind==='manual'&&x.month===m&&(x.rows||[]).length<250)||null;
+      if(!ch)ch={id:`${m}_m${uid()}`,month:m,kind:'manual',rows:[]};
+      const doc={month:m,kind:'manual',rows:(ch.rows||[]).concat([l]),at:new Date().toISOString()};
+      if(Store.mode==='db'){if(!await save('leads',ch.id,doc))break}
+      const ex=S.chunks.find(x=>x.id===ch.id);if(ex)ex.rows=doc.rows;else S.chunks.push(Object.assign({id:ch.id},doc));
+      closeModal(); toast('Lead saved'); render(); break}
+    case 'delLead': {
+      const ch=S.chunks.find(x=>x.id===el.dataset.c); if(!ch)break;
+      const rows=(ch.rows||[]).filter(r=>r.r!==el.dataset.r);
+      const keep=Object.assign({},ch,{rows,at:new Date().toISOString()}); delete keep.id;
+      if(Store.mode==='db'){ if(rows.length){if(!await save('leads',ch.id,keep))break} else {try{await Store.del('leads',ch.id)}catch(e){toast('Could not delete');break}} }
+      ch.rows=rows; if(!rows.length){S.chunks=S.chunks.filter(x=>x!==ch)}
+      toast('Lead deleted'); render(); break}
+    case 'lpage': S.leadF.page+=+el.dataset.d; render(); break;
+    case 'addPerson': personForm(null); break;
+    case 'editPerson': personForm(id); break;
+    case 'toggleLang': {const on=el.getAttribute('aria-pressed')!=='true'; el.setAttribute('aria-pressed',String(on)); break}
+    case 'pasteTeam': pasteTeamModal(); break;
+    case 'savePaste': {
+      const ps=pastedPeople().filter(p=>!p.dup); if(!ps.length){toast('Nothing new to add');break}
+      let n=0; for(const p of ps){delete p.dup;p.id=uid();p.createdAt=new Date().toISOString(); if(Store.mode==='db'&&!await save('staff',p.id,p))break; S.staff.push(p); n++}
+      S.staff.sort((a,b)=>a.name.localeCompare(b.name)); closeModal(); toast(`Added ${n} people`); render(); break}
+    case 'savePerson': {
+      const name=$('#pName').value.trim(); if(!name){toast('Enter a name');$('#pName').focus();break}
+      const langs=[...document.querySelectorAll('#pLangs button[aria-pressed="true"]')].map(b=>b.dataset.v);
+      if(!langs.length){toast('Pick at least one language');break}
+      const base=id?staffById(id):{createdAt:new Date().toISOString()};
+      const p=Object.assign({},base,{name,code:$('#pCode').value.trim()||name.toUpperCase(),role:$('#pRole').value,branch:$('#pBranch').value.trim()||'—',langs,phone:$('#pPhone').value.trim(),active:$('#pActive').checked});
+      delete p.team; p.id=id||uid(); p.notes=p.notes||'';
+      if(Store.mode==='db'&&!await save('staff',p.id,p))break;
+      if(id)S.staff=S.staff.map(x=>x.id===id?p:x); else S.staff.push(p);
+      S.staff.sort((a,b)=>a.name.localeCompare(b.name)); closeModal(); toast(id?'Saved':'Added '+p.name); render(); break}
+    case 'askDelete': {
+      const p=staffById(id);
+      $('#delZone').innerHTML=`<div class="banner offline"><span class="sp">Delete ${esc(p.name)}? Their past leads will show as "Unknown". To keep their history, untick Active instead.</span><button class="btn sm danger solid" data-act="doDelete" data-id="${id}">Delete for good</button></div>`; break}
+    case 'doDelete': {
+      if(Store.mode==='db'){try{await Store.del('staff',id)}catch(e){toast('Could not delete');break}}
+      S.staff=S.staff.filter(p=>p.id!==id); closeModal(); toast('Deleted'); render(); break}
+    case 'pick': {
+      const active=S.staff.filter(p=>p.active!==false), picked=new Set([...S.cycles.c1,...S.cycles.c2,...S.cycles.c3]);
+      const pool=active.filter(p=>!picked.has(p.id)); const n=pickCount(pool.length,c);
+      S.cycles['c'+c]=shuffle(pool).slice(0,n).map(p=>p.id);
+      await saveCycles(); toast(`Picked ${n} people for cycle ${c}`); render(); break}
+    case 'repick': S.cycles['c'+c]=[]; await saveCycles(); render(); break;
+    case 'swap': {
+      const active=S.staff.filter(p=>p.active!==false), picked=new Set([...S.cycles.c1,...S.cycles.c2,...S.cycles.c3]);
+      const pool=active.filter(p=>!picked.has(p.id)); if(!pool.length){toast('No one left to swap in this month');break}
+      const nw=shuffle(pool)[0]; S.cycles['c'+c]=S.cycles['c'+c].map(x=>x===id?nw.id:x);
+      await saveCycles(); toast(`${staffById(id).name} swapped for ${nw.name}`); render(); break}
+    case 'audit': auditForm(id,c); break;
+    case 'rate': el.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===el))); updAuditScore(); break;
+    case 'saveAudit': {
+      const sc=readRates(); if(Object.keys(sc).length<CRITERIA.length){toast('Rate all six points first');break}
+      const total=Object.values(sc).reduce((a,b)=>a+b,0);
+      const a={month:S.month,cycle:c,staffId:id,scores:sc,pct:total/30*100,chats:+$('#aChats').value||0,evaluator:$('#aEval').value,date:$('#aDate').value,notes:$('#aNotes').value.trim(),at:new Date().toISOString()};
+      try{localStorage.setItem('milife-evaluator',a.evaluator)}catch(e){}
+      const docId=`${S.month}_${id}`;
+      if(Store.mode==='db'&&!await save('audits',docId,a))break;
+      S.audits=S.audits.filter(x=>x.staffId!==id).concat([Object.assign({id:docId},a)]);
+      S.auditsAll[S.month]=S.audits;
+      closeModal(); toast(`Review saved · ${Math.round(a.pct)}/100`); render(); break}
+    case 'addPlat': {const list=readPlatforms();list.push({n:'',g:'Paid ads'});$('#platList').innerHTML=list.map((p,i)=>platRow(p,i)).join('');const inp=document.querySelector(`[data-pn="${list.length-1}"]`);inp&&inp.focus();break}
+    case 'delPlat': {const list=readPlatforms().filter((_,i)=>i!==+el.dataset.i);$('#platList').innerHTML=list.map((p,i)=>platRow(p,i)).join('');break}
+    case 'saveSettings': {
+      const s=S.settings; document.querySelectorAll('[data-w]').forEach(i=>s.weights[i.dataset.w]=Math.max(0,+i.value||0));
+      const list=v=>v.split(',').map(x=>x.trim()).filter(Boolean);
+      s.minLeads=Math.max(1,+$('#sMin').value||1); s.target=Math.max(0,+$('#sTarget').value||0);
+      const pl=readPlatforms(); if(pl.length)s.platforms=pl;
+      s.currency=$('#sCur').value;
+      for(const [k,idq] of [['channels','#sCh'],['languages','#sLang'],['reviewers','#sRev'],['regions','#sReg'],['creatives','#sCre']]){const v=list($(idq).value); if(v.length)s[k]=v}
+      s.confirmWords=$('#sConf').value;
+      if(Store.mode==='db'&&!await save('config','main',s))break; toast('Settings saved'); render(); break}
+    case 'resetSettings': {S.settings=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));render();toast('Defaults restored. Press Save to keep them.');break}
+    case 'askClearSample': $('#sampleZone').innerHTML=`<div class="banner offline"><span class="sp">Remove every sample lead and review?</span><button class="btn sm danger solid" data-act="clearSample">Yes, remove</button></div>`; break;
+    case 'clearSample': {
+      el.disabled=true; el.textContent='Removing…';
+      try{
+        if(Store.mode==='db'){
+          const [ls,as,cs,cps]=await Promise.all([Store.list('leads','sample',true),Store.list('audits','sample',true),Store.list('cycles','sample',true),Store.list('campaigns','sample',true).catch(()=>[])]);
+          for(const d of ls)await Store.del('leads',d.id); for(const d of as)await Store.del('audits',d.id); for(const d of cs)await Store.del('cycles',d.id); for(const d of cps)await Store.del('campaigns',d.id);
+        }else{ S.chunks=S.chunks.filter(c=>!c.sample); S.campaigns=S.campaigns.filter(c=>!c.sample); for(const m in S.auditsAll)S.auditsAll[m]=S.auditsAll[m].filter(a=>!a.sample); S.memCycles={}; }
+        S.auditsAll=Store.mode==='db'?{}:S.auditsAll;
+        toast('Sample data removed'); await loadMonth(); render();
+      }catch(e){console.error(e);toast('Could not remove all sample data. Try again.')}
+      break}
+    case 'backup': await offerFile(`milife-sales-backup-${S.month}.json`,JSON.stringify({exportedAt:new Date().toISOString(),month:S.month,staff:S.staff,settings:S.settings,campaigns:S.campaigns,leads:S.chunks,audits:S.audits,cycles:S.cycles},null,2)); break;
+  }
+}
+async function saveCycles(){
+  if(Store.mode==='db')await save('cycles',S.month,Object.assign({month:S.month,at:new Date().toISOString()},S.cycles));
+  else S.memCycles[S.month]=S.cycles;
+}
+async function offerFile(filename,data){
+  try{const dl=window.claude&&window.claude.use?await window.claude.use('downloads'):null; if(dl){await dl.save({filename,data});return}}catch(e){if(e&&/declin|cancel|reject/i.test(String(e.message||e)))return}
+  try{const url=URL.createObjectURL(new Blob([data],{type:/\.csv$/i.test(filename)?'text/csv':'text/plain'}));const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);return}catch(e){}
+  try{await navigator.clipboard.writeText(data);toast('Downloads aren\'t available here, so the data was copied to your clipboard')}catch(e){toast('Could not download or copy the file here')}
+}
+async function updateLeadStatus(sel){
+  const ch=S.chunks.find(x=>x.id===sel.dataset.c); if(!ch)return;
+  const st=sel.value; sel.className='stsel st-'+st;
+  const rows=(ch.rows||[]).map(r=>r.r===sel.dataset.r?Object.assign({},r,{st}):r);
+  const keep=Object.assign({},ch,{rows,at:new Date().toISOString()}); delete keep.id;
+  if(Store.mode==='db'&&!await save('leads',ch.id,keep)){render();return}
+  ch.rows=rows; toast(st==='Confirmed'?'Marked as confirmed':'Status updated');
+}
+
+/* ================= events ================= */
+document.addEventListener('click',e=>{
+  const go=e.target.closest('[data-go]'); if(go){e.preventDefault();location.hash=go.dataset.go;return}
+  const a=e.target.closest('[data-act]'); if(a&&a.tagName!=='SELECT'){e.preventDefault();act(a.dataset.act,a)}
+});
+$('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#overlay').classList.contains('open'))closeModal()});
+document.addEventListener('submit',e=>e.preventDefault());
+document.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.act==='leadStatus'){updateLeadStatus(t);return}
+  if(t.dataset.cf){S.cf[t.dataset.cf]=t.value;render();return}
+  if(t.id==='periodSel'){const v=t.value;if(v==='custom'){const r=curRange();S.period={mode:'custom',from:r.from,to:r.to>todayStr()?todayStr():r.to};render();return}S.period={mode:v};if(v==='month'&&!S.month)S.month=monthOf(todayStr());changePeriod();return}
+  if(t.id==='campSrc'){S.campSrc=t.value;render();return}
+  const lf={lstaff:'staff',lsrc:'src',lch:'ch',llang:'lang'}; if(lf[t.id]){S.leadF[lf[t.id]]=t.value;S.leadF.page=0;render();return}
+  const tf={tlang:'lang',tbranch:'branch',tstatus:'status'}; if(tf[t.id]){S.teamF[tf[t.id]]=t.value;render();return}
+  if(t.id==='boardBranch'){S.boardBranch=t.value;render()}
+});
+let typeT;
+document.addEventListener('input',e=>{
+  const t=e.target; if(t.id!=='lq'&&t.id!=='tq'&&t.id!=='campQ')return;
+  clearTimeout(typeT); typeT=setTimeout(()=>{
+    if(t.id==='lq'){S.leadF.q=t.value;S.leadF.page=0}else if(t.id==='campQ')S.campQ=t.value;else S.teamF.q=t.value;
+    const pos=t.selectionStart; render(); const n=document.getElementById(t.id); if(n){n.focus();try{n.setSelectionRange(pos,pos)}catch(_){}}
+  },250);
+});
+const VIEWS=['dashboard','closing','marketing','leads','audits','team','setup'];
+function route(){const h=location.hash.replace('#','');S.view=VIEWS.includes(h)?h:'dashboard';if(S.loaded)render();else document.querySelectorAll('.mi').forEach(b=>b.setAttribute('aria-current',b.dataset.go===S.view?'page':'false'));window.scrollTo(0,0)}
+window.addEventListener('hashchange',route);
+route();
+(async()=>{
+  try{await Auth.start()}catch(e){console.error(e);S.error='Could not connect to Firebase. Check config.js and your internet connection.';render();return}
+  loadAll();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,569 @@
+[
+ {
+  "id": "abdul-nazer",
+  "name": "Abdul Nazer",
+  "code": "ABDUL NAZER ZAHRA(AR)",
+  "branch": "Zahra",
+  "role": "Sales",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "abdulsalam",
+  "name": "Abdulsalam",
+  "code": "ABDULSALAM PUTHUR",
+  "branch": "Puthur",
+  "role": "Sales",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "amjad-mariyam",
+  "name": "Amjad (Mariyam)",
+  "code": "AMJAD(mariyam) GRE MEDICI",
+  "branch": "Medicity",
+  "role": "GRE",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "anees",
+  "name": "Anees",
+  "code": "ANEES PUTHUR(AR)",
+  "branch": "Puthur",
+  "role": "Sales",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "basheer",
+  "name": "Basheer",
+  "code": "BASHEER GRE PUTHOOR(AR)",
+  "branch": "Puthur",
+  "role": "GRE",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-anagha",
+  "name": "Dr Anagha",
+  "code": "DR ANAGHA MEDICARE",
+  "branch": "Medicare",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-anvar",
+  "name": "Dr Anvar",
+  "code": "DR ANVAR MILIFE PUTHUR",
+  "branch": "Puthur",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-anwar-ali",
+  "name": "Dr Anwar Ali",
+  "code": "Dr ANWAR ALI MEDICARE (AR )",
+  "branch": "Medicare",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-farsana",
+  "name": "Dr Farsana",
+  "code": "DR FARSANA MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-fathima",
+  "name": "Dr Fathima",
+  "code": "Dr FATHIMA MEDICITY (AR)",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Arabic",
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-fathima-rejina",
+  "name": "Dr Fathima Rejina",
+  "code": "DR FATHIMA REJINA MEDICAR",
+  "branch": "Medicare",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-fathima-thesni",
+  "name": "Dr Fathima Thesni",
+  "code": "DR FATHIMA THESNI MEDICAR",
+  "branch": "Medicare",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-jabir",
+  "name": "Dr Jabir",
+  "code": "DR JABIR MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-jijisha",
+  "name": "Dr Jijisha",
+  "code": "DR JIJISHA MILIFE PUTHUR",
+  "branch": "Puthur",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-jumana",
+  "name": "Dr Jumana",
+  "code": "DR JUMANA PUTHUR(AR)",
+  "branch": "Puthur",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-mahi-gopan",
+  "name": "Dr Mahi Gopan",
+  "code": "DR MAHI GOPAN MEDICITY",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam",
+   "English",
+   "Hindi"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-nandu",
+  "name": "Dr Nandu",
+  "code": "DR NANDU MEDICARE",
+  "branch": "Medicare",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-naseeba",
+  "name": "Dr Naseeba",
+  "code": "DR NASEEBA KOTTAKAL (AR)",
+  "branch": "Kottakal",
+  "role": "Doctor",
+  "langs": [
+   "Arabic",
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-sayyid",
+  "name": "Dr Sayyid",
+  "code": "DR SAYYID MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-shafi",
+  "name": "Dr Shafi",
+  "code": "DR SHAFI MEDICITY NATUROP",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "Naturopathy",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-sneha",
+  "name": "Dr Sneha",
+  "code": "Dr SNEHA MEDICITY KOTTAKAL",
+  "branch": "Medicity Kottakal",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-sredha",
+  "name": "Dr Sredha",
+  "code": "DR SREDHA MEDICITY",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-sreelakshmi",
+  "name": "Dr Sreelakshmi",
+  "code": "DR SREELAKSHMI MEDICITY N",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-suneeb",
+  "name": "Dr Suneeb",
+  "code": "DR SUNEEB MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-thoyyiba",
+  "name": "Dr Thoyyiba",
+  "code": "DR THOYYIBA PUTHUR(AR)",
+  "branch": "Puthur",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-vahab",
+  "name": "Dr Vahab",
+  "code": "DR VAHAB MEDICITY kottaka",
+  "branch": "Medicity Kottakal",
+  "role": "Doctor",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "dr-vismaya",
+  "name": "Dr Vismaya",
+  "code": "DR VISMAYA MEDICARE(AR)",
+  "branch": "Medicare",
+  "role": "Doctor",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "ilayaraja",
+  "name": "Ilayaraja",
+  "code": "ILAYARAJA EHK MEDICARE",
+  "branch": "Medicare",
+  "role": "Other",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "jabir-ibnu",
+  "name": "Jabir Ibnu",
+  "code": "JABIR IBNU MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "Sales",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "jimshad",
+  "name": "Jimshad",
+  "code": "JIMSHAD MEDICARE(AR)",
+  "branch": "Medicare",
+  "role": "Sales",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "mohamed-jafer",
+  "name": "Mohamed Jafer",
+  "code": "MOHAMED JAFER KOTTAKAL(AR)",
+  "branch": "Kottakal",
+  "role": "Sales",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "prashand",
+  "name": "Prashand",
+  "code": "PRASHAND MEDICITY (AR)",
+  "branch": "Medicity",
+  "role": "Sales",
+  "langs": [
+   "Arabic",
+   "English"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "raheesa",
+  "name": "Raheesa",
+  "code": "RAHEESA GRE MEDICITY",
+  "branch": "Medicity",
+  "role": "GRE",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "ramshad",
+  "name": "Ramshad",
+  "code": "RAMSHAD GRE PUTHUR",
+  "branch": "Puthur",
+  "role": "GRE",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "shabna",
+  "name": "Shabna",
+  "code": "SHABNA ZAHRA",
+  "branch": "Zahra",
+  "role": "Sales",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "shameem",
+  "name": "Shameem",
+  "code": "SHAMEEM GRE MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "GRE",
+  "langs": [
+   "Arabic",
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "sudeesh",
+  "name": "Sudeesh",
+  "code": "SUDEESH GRE MEDICITY(AR)",
+  "branch": "Medicity",
+  "role": "GRE",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "vibin",
+  "name": "Vibin",
+  "code": "VIBIN FOM KOTTAKAL",
+  "branch": "Kottakal",
+  "role": "FOM",
+  "langs": [
+   "Malayalam",
+   "English"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "vishnu",
+  "name": "Vishnu",
+  "code": "VISHNU GRE KOTTAKAL(AR)",
+  "branch": "Kottakal",
+  "role": "GRE",
+  "langs": [
+   "Arabic"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ },
+ {
+  "id": "yaser",
+  "name": "Yaser",
+  "code": "YASER GRE MEDICITY",
+  "branch": "Medicity",
+  "role": "GRE",
+  "langs": [
+   "Malayalam"
+  ],
+  "active": true,
+  "phone": "",
+  "notes": "",
+  "createdAt": "2026-11-11T13:45:00Z"
+ }
+]
