@@ -408,6 +408,7 @@ const DEFAULT_SETTINGS={
   ],
   channels:['WhatsApp','Lead form','Phone call','Website form','DM','In person'],
   reviewers:['Gokul Sir'],
+  branches:['Medicity','Medicare','Puthur','Kottakal','Zahra','Medicity Kottakal'],
   currency:'₹',
   regions:['GCC (all)','Saudi Arabia','UAE','Qatar','Kuwait','Oman','India','Kerala','Other'],
   creatives:['Video','Doctor video','Testimonial video','Image','Carousel','Search ad','Other'],
@@ -465,6 +466,10 @@ function initials(name){const w=String(name).replace(/^Dr\.?\s+/i,'').replace(/\
 function avatar(p,lg){return `<span class="av ${lg?'lg':''} t${hashN(p.id||p.name,5)}" aria-hidden="true">${esc(initials(p.name).toUpperCase())}</span>`}
 function langsOf(p){return Array.isArray(p.langs)&&p.langs.length?p.langs:[p.team||'Malayalam']}
 const LANG_VARS={Malayalam:'var(--c-ml)',Arabic:'var(--c-ar)',English:'var(--c-en)',Hindi:'var(--c-hi)'};
+function branchOptions(){
+  const used=S.staff.map(p=>p.branch).filter(b=>b&&b!=='—');
+  return [...new Set([...(S.settings.branches||[]),...used])];
+}
 function langColor(l){if(LANG_VARS[l])return LANG_VARS[l];const i=Math.max(0,S.settings.languages.indexOf(l));return ['var(--c-x1)','var(--c-x2)','var(--c-x3)'][i%3]}
 const CH_VARS={'WhatsApp':'var(--ch-wa)','Lead form':'var(--ch-form)','Phone call':'var(--ch-call)','Website form':'var(--ch-web)','DM':'var(--ch-dm)','In person':'var(--ch-person)'};
 function chColor(c){return CH_VARS[c]||'var(--ch-other)'}
@@ -544,10 +549,25 @@ function normStatus(raw,words){
   if(/contact|called|replied|talk|spoke|responded/.test(s))return 'Contacted';
   return 'New';
 }
+/* Match a lead-sheet label ("DR JABIR MEDICITY(AR)") to a person.
+   1. Exact match on the name, or on a lead-sheet label saved with an older record.
+   2. Otherwise the label must start with the person's name, on a whole-word boundary.
+      The longest (most specific) name wins: "DR FATHIMA REJINA MEDICAR" -> Dr Fathima Rejina, not Dr Fathima.
+      A "Dr" prefix on both sides counts in the score; a genuine tie returns null so the row is flagged, not misassigned. */
 function matchStaff(raw,staff){
   const s=normTxt(raw); if(!s)return null;
-  return staff.find(p=>normTxt(p.code)===s)||staff.find(p=>normTxt(p.name)===s)||staff.find(p=>normTxt(p.name.replace(/^Dr /,''))===s)
-    ||staff.find(p=>p.code&&(normTxt(p.code).startsWith(s)||s.startsWith(normTxt(p.code))))||null;
+  const exact=staff.find(p=>p.code&&normTxt(p.code)===s)||staff.find(p=>normTxt(p.name)===s);
+  if(exact)return exact;
+  const noDr=t=>t.replace(/^dr /,'');
+  const sIsDr=/^dr /.test(s), sBare=noDr(s);
+  let best=null, bestScore=0, tie=false;
+  for(const p of staff){
+    const n=normTxt(p.name), bare=noDr(n); if(!bare)continue;
+    if(!(sBare===bare||sBare.startsWith(bare+' ')))continue;
+    const score=bare.length*2+(sIsDr===/^dr /.test(n)?1:0);
+    if(score>bestScore){best=p;bestScore=score;tie=false}else if(score===bestScore)tie=true;
+  }
+  return tie?null:best;
 }
 function parseCSV(text){
   const first=(text.split(/\r?\n/)[0]||'');
@@ -798,7 +818,7 @@ function mergeSettings(cfg){
   const s=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
   if(cfg.weights){Object.assign(s.weights,cfg.weights); if(cfg.weights.conversions!=null&&cfg.weights.confirmations==null)s.weights.confirmations=cfg.weights.conversions; delete s.weights.conversions}
   for(const k of ['minLeads','target','confirmWords','currency'])if(cfg[k]!==undefined)s[k]=cfg[k];
-  for(const k of ['languages','channels','reviewers','regions','creatives'])if(Array.isArray(cfg[k])&&cfg[k].length)s[k]=cfg[k];
+  for(const k of ['languages','channels','reviewers','regions','creatives','branches'])if(Array.isArray(cfg[k])&&cfg[k].length)s[k]=cfg[k];
   if(Array.isArray(cfg.platforms)&&cfg.platforms.length)s.platforms=cfg.platforms.map(p=>typeof p==='string'?{n:p,g:'Other'}:p);
   return s;
 }
@@ -1472,7 +1492,7 @@ function vTeam(){
   const rows=S.staff.filter(p=>(!q||normTxt(p.name+' '+p.code).includes(q))&&(!f.lang||langsOf(p).includes(f.lang))&&(!f.branch||p.branch===f.branch)&&(f.status==='all'||(f.status==='active'?p.active!==false:p.active===false)));
   const act=S.staff.filter(p=>p.active!==false);
   const multi=act.filter(p=>langsOf(p).length>1).length;
-  return `${header('Sales team',`${act.length} active people. "Name in lead sheet" must match your lead sheet's dropdown so imported leads land on the right person.`,`<button class="btn" data-act="pasteTeam">Paste a list</button><button class="btn primary" data-act="addPerson">${IC.plus}Add person</button>`,'none')}
+  return `${header('Sales team',`${act.length} active people. Leads are matched to people by name, so use the same names as your lead sheet.`,`<button class="btn" data-act="pasteTeam">Paste a list</button><button class="btn primary" data-act="addPerson">${IC.plus}Add person</button>`,'none')}
   <section class="grid g-tiles">
     ${S.settings.languages.map(l=>`<div class="tile"><span class="lbl"><i style="background:${langColor(l)}"></i>${esc(l)}</span><span class="val num">${act.filter(p=>langsOf(p).includes(l)).length}</span><span class="sub">people handle ${esc(l)} leads</span></div>`).join('')}
     <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>Multi-language</span><span class="val num">${multi}</span><span class="sub">handle 2 or more languages</span></div>
@@ -1484,8 +1504,8 @@ function vTeam(){
       <select id="tbranch" aria-label="Branch"><option value="">All branches</option>${branches.map(b=>`<option ${f.branch===b?'selected':''}>${esc(b)}</option>`).join('')}</select>
       <select id="tstatus" aria-label="Status">${[['active','Active'],['inactive','Inactive'],['all','Everyone']].map(([v,t])=>`<option value="${v}" ${f.status===v?'selected':''}>${t}</option>`).join('')}</select>
     </div>
-    ${rows.length?`<div class="tbl-wrap"><table><thead><tr><th>Person</th><th>Languages</th><th>Branch</th><th>Name in lead sheet</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>
-    ${rows.map(p=>`<tr><td><div class="who-cell">${avatar(p)}<div><button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button><small>${esc(p.role)}${p.notes?' · '+esc(p.notes):''}</small></div></div></td><td>${langChips(p)}</td><td>${esc(p.branch)}</td><td class="note">${esc(p.code||'')}</td><td class="num">${esc(p.phone||'')}</td><td>${p.active!==false?'<span class="chip good">Active</span>':'<span class="chip mute">Inactive</span>'}</td>
+    ${rows.length?`<div class="tbl-wrap"><table><thead><tr><th>Person</th><th>Languages</th><th>Branch</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>
+    ${rows.map(p=>`<tr><td><div class="who-cell">${avatar(p)}<div><button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button><small>${esc(p.role)}${p.notes?' · '+esc(p.notes):''}</small></div></div></td><td>${langChips(p)}</td><td>${esc(p.branch)}</td><td class="num">${esc(p.phone||'')}</td><td>${p.active!==false?'<span class="chip good">Active</span>':'<span class="chip mute">Inactive</span>'}</td>
       <td><button class="btn sm" data-act="editPerson" data-id="${p.id}">Edit</button></td></tr>`).join('')}
     </tbody></table></div>`:`<div class="empty"><img src="emblem.png" alt=""><h2>No one here</h2><p>Add people one by one, or paste the names from your lead sheet's dropdown.</p></div>`}
   </section>`;
@@ -1495,7 +1515,7 @@ function vTeam(){
 function vSetup(){
   const s=S.settings,w=s.weights;
   const wrow=(k,t,d)=>`<label class="f">${t}<input type="number" min="0" max="100" step="5" data-w="${k}" value="${+w[k]||0}"><span class="hint">${d}</span></label>`;
-  return `${header('Settings','Reviewers, lead platforms, languages, markets and how the score is worked out.','','none')}
+  return `${header('Settings','Reviewers, lead platforms, languages, branches, markets and how the score is worked out.','','none')}
   <section class="card"><div class="card-h"><div><h2>WhatsApp reviewers</h2><p>People who can review chats. The first name is used by default in the review form.</p></div></div>
     <label class="f">Reviewers (comma separated)<input type="text" id="sRev" value="${esc(s.reviewers.join(', '))}"></label></section>
   <section class="card"><div class="card-h"><div><h2>Lead platforms</h2><p>Where leads come from. The group decides the summary on the dashboard (Paid ads, Website, Referral, Management…).</p></div><button class="btn sm" data-act="addPlat">${IC.plus}Add platform</button></div>
@@ -1503,6 +1523,7 @@ function vSetup(){
   <section class="grid g-2">
     <div class="card"><h2>Channels</h2><p class="note" style="margin:4px 0 12px">How the lead reached the team (WhatsApp, lead form…)</p><label class="f">Channels (comma separated)<input type="text" id="sCh" value="${esc(s.channels.join(', '))}"></label></div>
     <div class="card"><h2>Languages</h2><p class="note" style="margin:4px 0 12px">Languages leads speak and staff can handle</p><label class="f">Languages (comma separated)<input type="text" id="sLang" value="${esc(s.languages.join(', '))}"></label></div>
+    <div class="card"><h2>Branches</h2><p class="note" style="margin:4px 0 12px">MiLife locations staff work from. People pick one of these, so reports never split on typos.</p><label class="f">Branches (comma separated)<input type="text" id="sBr" value="${esc((s.branches||[]).join(', '))}"></label></div>
     <div class="card"><h2>Markets</h2><p class="note" style="margin:4px 0 12px">Where campaigns are targeted (GCC, Saudi Arabia, India…)</p><label class="f">Markets (comma separated)<input type="text" id="sReg" value="${esc(s.regions.join(', '))}"></label></div>
     <div class="card"><h2>Ad spend</h2><p class="note" style="margin:4px 0 12px">Currency for campaign spend, and creative types</p><div class="form"><label class="f">Currency<select id="sCur">${['₹','SAR','AED','USD','QAR','KWD','OMR'].map(c=>`<option ${s.currency===c?'selected':''}>${c}</option>`).join('')}</select></label><label class="f">Creative types<input type="text" id="sCre" value="${esc(s.creatives.join(', '))}"></label></div></div>
   </section>
@@ -1549,15 +1570,13 @@ function personModal(id){
 
 function personForm(id){
   const p=id?staffById(id):{name:'',code:'',role:'Sales',branch:'',langs:[S.settings.languages[0]],phone:'',notes:'',active:true};
-  const branches=[...new Set(S.staff.map(x=>x.branch).filter(b=>b&&b!=='—'))].sort();
   const pl=langsOf(p);
-  openModal(`<div class="modal-h"><div><h2>${id?'Edit '+esc(p.name):'Add a person'}</h2><p>Pick every language this person can handle.</p></div>${closeBtn}</div>
+  openModal(`<div class="modal-h"><div><h2>${id?'Edit '+esc(p.name):'Add a person'}</h2><p>Use the name as it starts in your lead sheet, so leads are matched automatically.</p></div>${closeBtn}</div>
   <form id="pform" class="form">
-    <label class="f">Name<input type="text" id="pName" required value="${esc(p.name)}"></label>
-    <label class="f">Name in lead sheet<input type="text" id="pCode" value="${esc(p.code||'')}" placeholder="e.g. DR JABIR MEDICITY(AR)"></label>
+    <label class="f full">Name<input type="text" id="pName" required value="${esc(p.name)}" placeholder="e.g. Dr Jabir" autocomplete="off"></label>
     <div class="f full" style="display:grid;gap:8px;font-size:13px;font-weight:800;color:var(--ink-2)">Languages handled<div class="pick" id="pLangs">${S.settings.languages.map(l=>`<button type="button" data-act="toggleLang" data-v="${esc(l)}" aria-pressed="${pl.includes(l)}"><i style="background:${langColor(l)}"></i>${esc(l)}</button>`).join('')}</div></div>
     <label class="f">Role<select id="pRole">${ROLES.map(r=>`<option ${p.role===r?'selected':''}>${r}</option>`).join('')}</select></label>
-    <label class="f">Branch<input type="text" id="pBranch" list="branchList" value="${esc(p.branch==='—'?'':p.branch)}"><datalist id="branchList">${branches.map(b=>`<option value="${esc(b)}">`).join('')}</datalist></label>
+    <label class="f">Branch<select id="pBranch"><option value="">Select branch</option>${branchOptions().map(b=>`<option ${p.branch===b?'selected':''}>${esc(b)}</option>`).join('')}</select></label>
     <label class="f">WhatsApp number<input type="tel" id="pPhone" value="${esc(p.phone||'')}"></label>
     <label class="f" style="align-self:end;display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" id="pActive" ${p.active!==false?'checked':''}> Active (in reviews and leaderboard)</label>
   </form>
@@ -1650,7 +1669,7 @@ function impPreview(){
   const unk=Object.entries(unknown);
   $('#impPrev').innerHTML=`<div class="kv"><div><span>Ready</span><b class="num">${out.length}</b></div><div><span>Confirmed</span><b class="num">${out.filter(l=>l.st==='Confirmed').length}</b></div><div><span>Staff not found</span><b class="num">${unk.reduce((s,x)=>s+x[1],0)}</b></div><div><span>Bad dates</span><b class="num">${badDate.length}</b></div></div>
   <p class="note" style="margin-top:8px">Months: ${Object.entries(months).map(([m,n])=>monthLabel(m)+' '+n).join(' · ')||'—'}</p>
-  ${unk.length?`<p class="note"><b>These names didn't match anyone and will be skipped:</b> ${unk.slice(0,12).map(([k,n])=>esc(k)+' ('+n+')').join(', ')}${unk.length>12?'…':''}. Add them under Sales team, or fix "Name in lead sheet", then import again.</p>`:''}
+  ${unk.length?`<p class="note"><b>These names didn't match anyone and will be skipped:</b> ${unk.slice(0,12).map(([k,n])=>esc(k)+' ('+n+')').join(', ')}${unk.length>12?'…':''}. Add them under Sales team using the same name as in the sheet, then import again.</p>`:''}
   ${out.length?`<div class="tbl-wrap" style="margin-top:10px"><table><thead><tr><th>Date</th><th>Staff</th><th>Platform</th><th>Channel</th><th>Language</th><th>Status</th><th>Lead</th></tr></thead><tbody>${out.slice(0,5).map(l=>`<tr><td>${fmtDate(l.d)}</td><td>${esc(staffById(l.s).name)}</td><td>${esc(l.src)}</td><td>${esc(l.ch)}</td><td>${esc(l.lang)}</td><td>${l.st}</td><td>${esc(l.nm)}</td></tr>`).join('')}</tbody></table></div>`:''}`;
   const b=$('#impGo'); if(b){b.disabled=!out.length;b.textContent=`Import ${out.length} leads`}
 }
@@ -1788,7 +1807,7 @@ async function act(name,el){
       const langs=[...document.querySelectorAll('#pLangs button[aria-pressed="true"]')].map(b=>b.dataset.v);
       if(!langs.length){toast('Pick at least one language');break}
       const base=id?staffById(id):{createdAt:new Date().toISOString()};
-      const p=Object.assign({},base,{name,code:$('#pCode').value.trim()||name.toUpperCase(),role:$('#pRole').value,branch:$('#pBranch').value.trim()||'—',langs,phone:$('#pPhone').value.trim(),active:$('#pActive').checked});
+      const p=Object.assign({},base,{name,code:base.code||'',role:$('#pRole').value,branch:$('#pBranch').value.trim()||'—',langs,phone:$('#pPhone').value.trim(),active:$('#pActive').checked});
       delete p.team; p.id=id||uid(); p.notes=p.notes||'';
       if(Store.mode==='db'&&!await save('staff',p.id,p))break;
       if(id)S.staff=S.staff.map(x=>x.id===id?p:x); else S.staff.push(p);
@@ -1830,7 +1849,7 @@ async function act(name,el){
       s.minLeads=Math.max(1,+$('#sMin').value||1); s.target=Math.max(0,+$('#sTarget').value||0);
       const pl=readPlatforms(); if(pl.length)s.platforms=pl;
       s.currency=$('#sCur').value;
-      for(const [k,idq] of [['channels','#sCh'],['languages','#sLang'],['reviewers','#sRev'],['regions','#sReg'],['creatives','#sCre']]){const v=list($(idq).value); if(v.length)s[k]=v}
+      for(const [k,idq] of [['channels','#sCh'],['languages','#sLang'],['reviewers','#sRev'],['regions','#sReg'],['creatives','#sCre'],['branches','#sBr']]){const v=list($(idq).value); if(v.length)s[k]=v}
       s.confirmWords=$('#sConf').value;
       if(Store.mode==='db'&&!await save('config','main',s))break; toast('Settings saved'); render(); break}
     case 'resetSettings': {S.settings=JSON.parse(JSON.stringify(DEFAULT_SETTINGS));render();toast('Defaults restored. Press Save to keep them.');break}
