@@ -11,7 +11,8 @@ service cloud.firestore {
         && request.auth.token.email.lower() in [
           'rashidp.connect@gmail.com',
           'admin@milifemedicity.com',
-          'gokul@milifemedicity.com'
+          'gokul@milifemedicity.com',
+          'milifesalesmanager@gmail.com'
         ];
     }
 
