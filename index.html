@@ -622,6 +622,13 @@ function computeBoard(staff,leads,audits,settings){
   return rows;
 }
 function gradeOf(s){if(s==null)return {t:'No data',c:'mute'}; if(s>=85)return {t:'Star',c:'star'}; if(s>=70)return {t:'Strong',c:'good'}; if(s>=55)return {t:'Average',c:'warn'}; return {t:'Needs coaching',c:'bad'}}
+function auditSortMode(){try{return localStorage.getItem('milife-audit-sort')||'picked'}catch(e){return 'picked'}}
+/* 'picked' keeps the pick order. 'high'/'low' put reviewed people first, sorted by score; people waiting for review follow in pick order. */
+function sortByScore(ids,auditBy,mode){
+  if(mode!=='high'&&mode!=='low')return ids;
+  const dir=mode==='high'?-1:1, done=ids.filter(id=>auditBy[id]), wait=ids.filter(id=>!auditBy[id]);
+  return done.sort((a,b)=>dir*(auditBy[a].pct-auditBy[b].pct)).concat(wait);
+}
 function pickCount(remaining,cycle){const left=Math.max(1,4-cycle);return Math.min(remaining,Math.ceil(remaining/left))}
 function shuffle(arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const r=new Uint32Array(1);crypto.getRandomValues(r);const j=r[0]%(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
 
@@ -1457,9 +1464,9 @@ function vAudits(){
   const picked=new Set([...S.cycles.c1,...S.cycles.c2,...S.cycles.c3]);
   const remaining=active.filter(p=>!picked.has(p.id));
   const auditBy={}; for(const a of S.audits)auditBy[a.staffId]=a;
-  const cur=currentCycle(S.month), done=S.audits.length;
+  const cur=currentCycle(S.month), done=S.audits.length, sortMode=auditSortMode();
   const cards=[1,2,3].map(c=>{
-    const ids=(S.cycles['c'+c]||[]).filter(id=>staffById(id)); const reviewed=ids.filter(id=>auditBy[id]).length;
+    const ids=sortByScore((S.cycles['c'+c]||[]).filter(id=>staffById(id)),auditBy,sortMode); const reviewed=ids.filter(id=>auditBy[id]).length;
     const prevPicked=c===1||(S.cycles['c'+(c-1)]||[]).length>0;
     const n=pickCount(remaining.length,c);
     return `<div class="card cycle ${cur===c?'now':''}">
@@ -1471,7 +1478,7 @@ function vAudits(){
         <button class="btn ${cur===c?'primary':''}" data-act="pick" data-c="${c}" style="justify-self:start" ${remaining.length&&prevPicked?'':'disabled'}>${IC.shuffle}Pick ${n} at random</button>
         ${!prevPicked?'<span class="note">Pick cycle '+(c-1)+' first.</span>':''}`}
     </div>`}).join('');
-  const recent=S.audits.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,10);
+  const sm=auditSortMode(), recent=sm==='high'||sm==='low'?S.audits.slice().sort((a,b)=>(sm==='high'?-1:1)*(a.pct-b.pct)):S.audits.slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||''))).slice(0,10);
   return `${header('WhatsApp audits',`<b>${monthLabel(S.month)}.</b> Every 10 days a random third of the active team is picked, so each person is reviewed once a month. ${esc((S.settings.reviewers||[]).join(', '))} reviews their chats and scores six points.`,'','month')}
   <section class="grid g-tiles">
     <div class="tile"><span class="lbl"><i></i>Active team</span><span class="val num">${active.length}</span><span class="sub">${pickCount(active.length,1)} per cycle</span></div>
@@ -1479,8 +1486,9 @@ function vAudits(){
     <div class="tile"><span class="lbl"><i style="background:var(--gold)"></i>Waiting for review</span><span class="val num">${pendingAudits()}</span><span class="sub">Picked, not scored yet</span></div>
     <div class="tile"><span class="lbl"><i style="background:var(--line)"></i>Not picked yet</span><span class="val num">${remaining.length}</span><span class="sub">Left for later cycles</span></div>
   </section>
+  <div class="toolbar" style="justify-content:flex-end;align-items:center;gap:10px"><span class="note" style="font-weight:700">Sort reviewed people</span><div class="seg" role="group" aria-label="Sort reviewed people">${[['picked','Order picked'],['high','Score: high → low'],['low','Score: low → high']].map(([v,t])=>`<button type="button" data-act="auditSort" data-v="${v}" aria-pressed="${sortMode===v}">${t}</button>`).join('')}</div></div>
   <section class="grid g-3">${cards}</section>
-  ${recent.length?`<section class="card"><div class="card-h"><div><h2>Latest reviews</h2><p>Click a name to see their full breakdown</p></div></div><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Person</th><th>Cycle</th><th>Reviewer</th><th class="r">Chats</th><th class="r">Score</th><th>Coaching note</th><th></th></tr></thead><tbody>
+  ${recent.length?`<section class="card"><div class="card-h"><div><h2>${sm==='high'?'Reviews · highest score first':sm==='low'?'Reviews · lowest score first':'Latest reviews'}</h2><p>Click a name to see their full breakdown</p></div></div><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Person</th><th>Cycle</th><th>Reviewer</th><th class="r">Chats</th><th class="r">Score</th><th>Coaching note</th><th></th></tr></thead><tbody>
     ${recent.map(a=>{const p=staffById(a.staffId);return `<tr><td class="num">${fmtDate(a.date)}</td><td>${p?`<div class="who-cell">${avatar(p)}<button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button></div>`:'—'}</td><td>${a.cycle}</td><td>${esc(a.evaluator||'')}</td><td class="r num">${a.chats||''}</td><td class="r"><span class="chip ${a.pct>=70?'good':a.pct>=50?'warn':'bad'}">${Math.round(a.pct)}</span></td><td style="white-space:normal;min-width:240px" class="note">${esc(a.notes||'')}</td><td class="r">${p?`<button class="btn sm" data-act="audit" data-id="${p.id}" data-c="${a.cycle}">Edit</button>`:''}</td></tr>`}).join('')}
   </tbody></table></div></section>`:''}
   <section class="card"><div class="card-h"><div><h2>What gets checked</h2><p>Each point is rated 1 to 5. Six points add up to a score out of 100.</p></div></div>
@@ -1845,6 +1853,7 @@ async function act(name,el){
       S.cycles['c'+oc]=S.cycles['c'+oc].map(x=>x===other?id:x);
       await saveCycles(); toast(`${me.name} moved to cycle ${oc}; ${staffById(other).name} takes the place in cycle ${cur}`); render(); break}
     case 'audit': auditForm(id,c); break;
+    case 'auditSort': try{localStorage.setItem('milife-audit-sort',el.dataset.v)}catch(e){} render(); break;
     case 'rate': el.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===el))); updAuditScore(); break;
     case 'clearRates': document.querySelectorAll('.rate button[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false')); updAuditScore(); break;
     case 'askDelAudit': $('#delZone').innerHTML=`<div class="banner offline"><span class="sp">Delete ${esc(staffById(id).name)}'s review for this month? They stay in cycle ${c} and can be reviewed again.</span><button class="btn sm danger solid" data-act="doDelAudit" data-id="${id}" data-c="${c}">Delete review</button></div>`; $('#delZone').scrollIntoView({block:'nearest'}); break;
