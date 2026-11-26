@@ -1828,9 +1828,20 @@ async function act(name,el){
     case 'repick': S.cycles['c'+c]=[]; await saveCycles(); render(); break;
     case 'swap': {
       const active=S.staff.filter(p=>p.active!==false), picked=new Set([...S.cycles.c1,...S.cycles.c2,...S.cycles.c3]);
-      const pool=active.filter(p=>!picked.has(p.id)); if(!pool.length){toast('No one left to swap in this month');break}
-      const nw=shuffle(pool)[0]; S.cycles['c'+c]=S.cycles['c'+c].map(x=>x===id?nw.id:x);
-      await saveCycles(); toast(`${staffById(id).name} swapped for ${nw.name}`); render(); break}
+      const pool=active.filter(p=>!picked.has(p.id)), me=staffById(id);
+      if(pool.length){
+        // someone not picked yet this month takes this place
+        const nw=shuffle(pool)[0]; S.cycles['c'+c]=S.cycles['c'+c].map(x=>x===id?nw.id:x);
+        await saveCycles(); toast(`${me.name} swapped for ${nw.name}`); render(); break}
+      // everyone is already picked: exchange places with someone in another cycle who hasn't been reviewed yet
+      const reviewed=new Set(S.audits.map(a=>a.staffId)), cur=+c;
+      const order=[1,2,3].filter(k=>k!==cur).sort((a,b)=>(a>cur?0:1)-(b>cur?0:1)||a-b);
+      let other=null, oc=0;
+      for(const k of order){const cand=S.cycles['c'+k].filter(x=>!reviewed.has(x)&&staffById(x)&&staffById(x).active!==false); if(cand.length){other=shuffle(cand)[0];oc=k;break}}
+      if(!other){toast('Everyone else has already been reviewed this month, so there is no one to swap with');break}
+      S.cycles['c'+cur]=S.cycles['c'+cur].map(x=>x===id?other:x);
+      S.cycles['c'+oc]=S.cycles['c'+oc].map(x=>x===other?id:x);
+      await saveCycles(); toast(`${me.name} moved to cycle ${oc}; ${staffById(other).name} takes the place in cycle ${cur}`); render(); break}
     case 'audit': auditForm(id,c); break;
     case 'rate': el.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===el))); updAuditScore(); break;
     case 'saveAudit': {
