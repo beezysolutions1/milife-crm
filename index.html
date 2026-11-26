@@ -1694,18 +1694,20 @@ async function impGo(){
 /* ---------- audit form ---------- */
 function auditForm(id,cycle){
   const p=staffById(id); if(!p)return;
-  const ex=S.audits.find(a=>a.staffId===id)||{scores:{}};
+  const saved=S.audits.find(a=>a.staffId===id), ex=saved||{scores:{}};
   const revs=S.settings.reviewers.length?S.settings.reviewers:['Gokul Sir'];
   const last=ex.evaluator||lastEvaluator(); const cur=revs.includes(last)?last:revs[0];
   openModal(`<div class="modal-h"><div class="who-cell">${avatar(p,true)}<div><h2>WhatsApp review · ${esc(p.name)}</h2><p>Cycle ${cycle} (${cycleRange(S.month,cycle)}) · ${langChips(p)} · open their WhatsApp and read recent lead chats.</p></div></div>${closeBtn}</div>
   <div class="crit">${CRITERIA.map(c=>`<div class="critrow"><div><b>${c.t}</b><span>${c.d}</span></div><div class="rate" role="group" aria-label="${c.t}">${[1,2,3,4,5].map(v=>`<button type="button" data-act="rate" data-k="${c.k}" data-v="${v}" aria-pressed="${(ex.scores||{})[c.k]===v}">${v}</button>`).join('')}</div></div>`).join('')}</div>
+  <button type="button" class="btn sm" data-act="clearRates" style="justify-self:start;margin-top:-4px">Clear all ratings</button>
   <div class="form">
     <label class="f">Reviewed by<select id="aEval">${revs.map(r=>`<option ${r===cur?'selected':''}>${esc(r)}</option>`).join('')}</select></label>
     <label class="f">Chats checked<input type="number" min="0" id="aChats" value="${esc(ex.chats||'')}"></label>
     <label class="f">Date<input type="date" id="aDate" value="${esc(ex.date||todayStr())}"></label>
     <label class="f full">Coaching note<textarea id="aNotes" style="min-height:80px;font-family:var(--font-body);font-size:15px" placeholder="What to keep doing, what to fix">${esc(ex.notes||'')}</textarea></label>
   </div>
-  <div class="modal-f"><span style="margin-right:auto;display:flex;align-items:baseline;gap:6px" class="note"><span class="bigscore num" id="aScore">–</span>/100 <span id="aLeft"></span></span><button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveAudit" data-id="${id}" data-c="${cycle}">Save review</button></div>`);
+  ${saved?'<div id="delZone"></div>':''}
+  <div class="modal-f"><span style="margin-right:auto;display:flex;align-items:baseline;gap:6px" class="note"><span class="bigscore num" id="aScore">–</span>/100 <span id="aLeft"></span></span>${saved?`<button class="btn danger" data-act="askDelAudit" data-id="${id}" data-c="${cycle}">${IC.trash}Delete review</button>`:''}<button class="btn" data-act="close">Cancel</button><button class="btn primary" data-act="saveAudit" data-id="${id}" data-c="${cycle}">Save review</button></div>`);
   updAuditScore();
 }
 function lastEvaluator(){try{return localStorage.getItem('milife-evaluator')||''}catch(e){return ''}}
@@ -1844,6 +1846,14 @@ async function act(name,el){
       await saveCycles(); toast(`${me.name} moved to cycle ${oc}; ${staffById(other).name} takes the place in cycle ${cur}`); render(); break}
     case 'audit': auditForm(id,c); break;
     case 'rate': el.parentElement.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b===el))); updAuditScore(); break;
+    case 'clearRates': document.querySelectorAll('.rate button[aria-pressed="true"]').forEach(b=>b.setAttribute('aria-pressed','false')); updAuditScore(); break;
+    case 'askDelAudit': $('#delZone').innerHTML=`<div class="banner offline"><span class="sp">Delete ${esc(staffById(id).name)}'s review for this month? They stay in cycle ${c} and can be reviewed again.</span><button class="btn sm danger solid" data-act="doDelAudit" data-id="${id}" data-c="${c}">Delete review</button></div>`; $('#delZone').scrollIntoView({block:'nearest'}); break;
+    case 'doDelAudit': {
+      const a=S.audits.find(x=>x.staffId===id); if(!a){closeModal();break}
+      const docId=a.id||`${S.month}_${id}`;
+      if(Store.mode==='db'){try{await Store.del('audits',docId)}catch(e){toast('Could not delete');break}}
+      S.audits=S.audits.filter(x=>x.staffId!==id); S.auditsAll[S.month]=S.audits;
+      closeModal(); toast(`Review deleted · ${staffById(id).name} is waiting for review again`); render(); break}
     case 'saveAudit': {
       const sc=readRates(); if(Object.keys(sc).length<CRITERIA.length){toast('Rate all six points first');break}
       const total=Object.values(sc).reduce((a,b)=>a+b,0);
