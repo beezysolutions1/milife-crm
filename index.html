@@ -175,6 +175,8 @@ th.sortable:hover{color:var(--teal-ink)}
 td.r,th.r{text-align:right}
 tbody tr{transition:background .15s}
 tbody tr:hover{background:var(--teal-tint)}
+tr.rowlink{cursor:pointer}
+.namebtn:hover{color:var(--teal-ink);text-decoration:underline;text-underline-offset:3px}
 tbody tr:last-child td{border-bottom:0}
 .rank{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:9px;font-weight:900;font-size:13px;color:var(--muted);font-family:var(--font-display)}
 .rank.r1{background:var(--gold);color:#3b2a00}
@@ -993,7 +995,7 @@ function boardTable(board){
   if(!rows.length)return '<div class="empty">No team members match this filter.</div>';
   const th=(k,t,r='')=>`<th class="sortable ${r}" data-act="sort" data-k="${k}" aria-sort="${S.boardSort.k===k?(S.boardSort.dir>0?'ascending':'descending'):'none'}">${t}${S.boardSort.k===k?(S.boardSort.dir>0?' ↑':' ↓'):''}</th>`;
   return `<div class="tbl-wrap"><table><thead><tr><th>#</th>${th('name','Person')}<th>Languages</th>${th('n','Leads','r')}${th('c','Confirmed','r')}${th('rate','Conf. rate','r')}${th('audit','WhatsApp','r')}${th('score','Score','r')}<th>Grade</th></tr></thead><tbody>
-  ${rows.map(b=>`<tr><td>${b.rank?`<span class="rank ${b.rank<=3?'r'+b.rank:''}">${b.rank}</span>`:'<span class="rank">–</span>'}</td>
+  ${rows.map(b=>`<tr class="rowlink" data-person="${b.p.id}"><td>${b.rank?`<span class="rank ${b.rank<=3?'r'+b.rank:''}">${b.rank}</span>`:'<span class="rank">–</span>'}</td>
     <td><div class="who-cell">${avatar(b.p)}<div><button class="namebtn" data-act="person" data-id="${b.p.id}">${esc(b.p.name)}</button><small>${esc(b.p.role)} · ${esc(b.p.branch)}${b.p.active===false?' · inactive':''}</small></div></div></td>
     <td>${langChips(b.p)}</td>
     <td class="r num">${b.n}</td><td class="r num"><b>${b.c}</b></td><td class="r num">${b.n?fmtPct(b.rate*100,1):'–'}</td>
@@ -1505,7 +1507,7 @@ function vTeam(){
       <select id="tstatus" aria-label="Status">${[['active','Active'],['inactive','Inactive'],['all','Everyone']].map(([v,t])=>`<option value="${v}" ${f.status===v?'selected':''}>${t}</option>`).join('')}</select>
     </div>
     ${rows.length?`<div class="tbl-wrap"><table><thead><tr><th>Person</th><th>Languages</th><th>Branch</th><th>WhatsApp</th><th>Status</th><th></th></tr></thead><tbody>
-    ${rows.map(p=>`<tr><td><div class="who-cell">${avatar(p)}<div><button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button><small>${esc(p.role)}${p.notes?' · '+esc(p.notes):''}</small></div></div></td><td>${langChips(p)}</td><td>${esc(p.branch)}</td><td class="num">${esc(p.phone||'')}</td><td>${p.active!==false?'<span class="chip good">Active</span>':'<span class="chip mute">Inactive</span>'}</td>
+    ${rows.map(p=>`<tr class="rowlink" data-person="${p.id}"><td><div class="who-cell">${avatar(p)}<div><button class="namebtn" data-act="person" data-id="${p.id}">${esc(p.name)}</button><small>${esc(p.role)}${p.notes?' · '+esc(p.notes):''}</small></div></div></td><td>${langChips(p)}</td><td>${esc(p.branch)}</td><td class="num">${esc(p.phone||'')}</td><td>${p.active!==false?'<span class="chip good">Active</span>':'<span class="chip mute">Inactive</span>'}</td>
       <td><button class="btn sm" data-act="editPerson" data-id="${p.id}">Edit</button></td></tr>`).join('')}
     </tbody></table></div>`:`<div class="empty"><img src="emblem.png" alt=""><h2>No one here</h2><p>Add people one by one, or paste the names from your lead sheet's dropdown.</p></div>`}
   </section>`;
@@ -1889,7 +1891,9 @@ async function updateLeadStatus(sel){
 /* ================= events ================= */
 document.addEventListener('click',e=>{
   const go=e.target.closest('[data-go]'); if(go){e.preventDefault();location.hash=go.dataset.go;return}
-  const a=e.target.closest('[data-act]'); if(a&&a.tagName!=='SELECT'){e.preventDefault();act(a.dataset.act,a)}
+  const a=e.target.closest('[data-act]'); if(a&&a.tagName!=='SELECT'){e.preventDefault();act(a.dataset.act,a);return}
+  const row=e.target.closest('tr[data-person]');
+  if(row&&!e.target.closest('button,a,input,select,textarea,label')&&!String(getSelection()).trim())personModal(row.dataset.person);
 });
 $('#overlay').addEventListener('click',e=>{if(e.target.id==='overlay')closeModal()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#overlay').classList.contains('open'))closeModal()});
